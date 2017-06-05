@@ -1,0 +1,54 @@
+
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+
+
+
+
+<script>
+  $(document).ready(function() {
+
+    $(".message").animate({width: '70%', left: '15%', right: '15%'}, 1000);
+    $(".message").html("<h2>" + '"' +"No one live forever" + '"' + "</h2>" + "<br>" + "<em>" + "- " + "@@" +"</em>");
+    $(".message").css({"background-color": "rgba(0,0,0,0.7)", "color":"white"});
+    
+    
+    $("#getMessage").on("click", function(){
+      $.ajax({
+        url: "http://api.forismatic.com/api/1.0/",
+        jsonp: 'jsonp',
+        dataType: 'jsonp',
+        data: {
+          method: 'getQuote',
+          lang: 'en',
+          format: 'jsonp'
+        }, 
+        success: function(json) {
+          $(".message").html("<h2>"+ '"' +json.quoteText + '"' + "</h2>" + "<br>" + "<em>" + "- " + json.quoteAuthor +"</em>");
+          
+    },})
+    });
+
+  });
+</script>
+
+
+<div class = "row text-center">
+   <div class = "row text-center">
+    <h2>My Random Quote Machine</h2>
+  </div>
+    <div class = "col-xs-12">
+      <button id = "getMessage" class = "btn btn-primary">
+        Get Message
+      </button>
+    </div>
+  </div>
+<br>
+<div class="container-fluid">
+  <div class = "row text-center">
+    <div class = "col-xs-12 well message">
+      The message will go here
+    </div>
+  </div>
+  
+</div>
