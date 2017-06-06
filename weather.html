@@ -10,25 +10,29 @@
         navigator.geolocation.getCurrentPosition(function(position) {
         lat = position.coords.latitude
         long = position.coords.longitude
-        
-        urel =urel + lat +',' +long
-        
-        $("#location").html('latitude: ' + lat + '<br>longitude: ' + long)
+        urel =urel + lat + ',' + long + '?units=si'
 
         $.ajax({
             url: urel,
             dataType: 'jsonp',
             success: function(data) {
-                $('#forecast').html(data.currently.summary)
+                $('#forecast').html(data.currently.summary);
+                console.log(urel);
+                $('#location').html(data.timezone);
+                $('#temp').html(Math.floor(data.currently.temperature) + '&deg;C');
+                $('#time').html(JSON.stringify(data.currently.time));
+                $('#infor').html('Feels like: ' + data.currently.apparentTemperature +'&deg;C' + ' ------- ' + 'Wind: ' + data.currently.windSpeed + ' ------- ' + 'Humidity: ' + data.currently.humidity);
+
             }
         })
         })}
 </script>
 
 
-<div class="container-fluid text-center">
-    <div id='location'>Location</div>
-    <p id='forecast'>forecast</p>
-    <i class="wi-day-cloudy-gusts"></i>
-    <div>infor</div>
+<div class="container text-center">
+    <p id='location'>Location</p>
+    <h1 id='temp'>temperature</h1>
+    <h2 id='forecast'>forecast</h2>
+    <p id='time'>time</p>
+    <p id='infor'>Infor</p>
 </div>
