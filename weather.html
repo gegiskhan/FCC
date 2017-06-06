@@ -1,4 +1,6 @@
 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/weather-icons/2.0.9/css/weather-icons.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/weather-icons/2.0.9/css/weather-icons-wind.css">
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 
 <script>
@@ -6,6 +8,7 @@
     var long = ''
     var urel = 'https://api.darksky.net/forecast/490e02d25af60d567f302f64df28e049/'
     //490e02d25af60d567f302f64df28e049
+    
     if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(function(position) {
         lat = position.coords.latitude
@@ -16,23 +19,61 @@
             url: urel,
             dataType: 'jsonp',
             success: function(data) {
+                $('#open').animate({width: '50%'}, 1000);
                 $('#forecast').html(data.currently.summary);
                 console.log(urel);
                 $('#location').html(data.timezone);
-                $('#temp').html(Math.floor(data.currently.temperature) + '&deg;C');
-                $('#time').html(JSON.stringify(data.currently.time));
-                $('#infor').html('Feels like: ' + data.currently.apparentTemperature +'&deg;C' + ' ------- ' + 'Wind: ' + data.currently.windSpeed + ' ------- ' + 'Humidity: ' + data.currently.humidity);
+                var temp = Math.floor(data.currently.temperature);
+                $('#temp').html(temp + '&deg;C');
+                console.log($('#temp').text())
+                var date = new Date(data.currently.time*1000);
+                var formattedTime = ('0' + date.getHours()).slice(-2) + ':' + ('0'+date.getMinutes()).slice(-2);
+                $('#time').html('Updated at: ' + formattedTime);
+                $('#infor').html('Feels like: ' + temp +'&deg;C' + ' | ' + 'Wind: ' + data.currently.windSpeed + ' m/s' + ' | ' + 'Humidity: ' + data.currently.humidity*100 +'%');
+                
+               $('#change').click(function(){
+                   if ($('#temp').text().indexOf('C')>-1){
+                   $('#temp').html(temp*9/5+32 + '&deg;F');
+                   $('#infor').html('Feels like: ' + (temp*9/5+32) +'&deg;F' + ' | ' + 'Wind: ' + data.currently.windSpeed + ' m/s' + ' | ' + 'Humidity: ' + data.currently.humidity*100 +'%');
+                   $('#change').text('C')
+                   }else{
+                       $('#temp').html(Math.floor(temp) + '&deg;C');
+                       $('#infor').html('Feels like: ' + temp +'&deg;C' + ' | ' + 'Wind: ' + data.currently.windSpeed + ' m/s' + ' | ' + 'Humidity: ' + data.currently.humidity*100 +'%');
+                       $('#change').text('F')
+                   }
+               })
+                
 
             }
         })
-        })}
+        })};
+        
 </script>
 
 
-<div class="container text-center">
+<div id='open' class="container text-center" style="background-color: rgba(0, 0, 0, 0.7); color: white">
     <p id='location'>Location</p>
-    <h1 id='temp'>temperature</h1>
-    <h2 id='forecast'>forecast</h2>
+    <i class="wi wi-night-sleet" style="font-size: 50px"></i>
+    <h1 id='temp' style="display: inline-block">temperature</h1>
+    <a id='change' style="display: inline-block">F</a>
+    <h2 id='forecast' >forecast</h2>
     <p id='time'>time</p>
     <p id='infor'>Infor</p>
+</div>
+<br>
+<div class="container">
+    <div class="row">
+        <div class="col-xs-2 well">
+        </div>
+        <div class="col-xs-2 well">
+        </div>
+        <div class="col-xs-2 well">
+        </div>
+        <div class="col-xs-2 well">
+        </div>
+        <div class="col-xs-2 well">
+        </div>
+        <div class="col-xs-2 well">
+        </div>
+    </div>
 </div>
