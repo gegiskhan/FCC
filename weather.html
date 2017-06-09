@@ -5,10 +5,12 @@
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 
 <script>
+    $(document).ready(function(){
+        
     var lat = ''
     var long = ''
-    var urel = 'https://api.darksky.net/forecast/490e02d25af60d567f302f64df28e049/'
-    //490e02d25af60d567f302f64df28e049
+    var urel = 'https://api.darksky.net/forecast/490e02d25af60d567f302f64df28e049/';
+    
     
     if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(function(position) {
@@ -17,9 +19,9 @@
         urel =urel + lat + ',' + long + '?units=si'
     
         $.ajax({
-            url: 'http://maps.googleapis.com/maps/api/geocode/json?latlng='+ lat+','+long+'&sensor=true',
+            url: 'https://maps.googleapis.com/maps/api/geocode/json?latlng='+ lat+','+long+'&sensor=true',
             success: function(json){
-                $('#location').html(json.results[0].formatted_address)
+                $('#location').html(json.results[1].formatted_address)
             }
         });
     
@@ -27,7 +29,8 @@
             url: urel,
             dataType: 'jsonp',
             success: function(data) {
-                $('#open').animate({width: '40%'}, 1000);
+                $('#open').animate({width: '40%'}, 1300);
+                
                 $('#forecast').html(data.currently.summary);
                 console.log(urel);
                 var temp = Math.floor(data.currently.temperature);
@@ -64,7 +67,7 @@
 
                 //forecast
                 var next_day = new Date(data.daily.data[1].time*1000);
-                var days = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+                var days = ['Sun','Mon','Tues','Wed','Thu','Fri','Sat'];
                 $('#next').html(days[next_day.getDay()] + ' '+next_day.getDate());
                 $('#next_max').html(Math.floor(data.daily.data[1].temperatureMax));
                 $('#next_min').html(Math.floor(data.daily.data[1].temperatureMin));
@@ -88,6 +91,7 @@
                 $('#next5').html(days[next5_day.getDay()] + ' '+next5_day.getDate());
                 $('#next5_max').html(Math.floor(data.daily.data[6].temperatureMax));
                 $('#next5_min').html(Math.floor(data.daily.data[6].temperatureMin));
+                $('#expand').slideDown(1600);
 
 
 
@@ -135,6 +139,7 @@
 
         })
         })};
+    });
         
 </script>
 
@@ -149,12 +154,13 @@
     .box {
         background-color: rgba(0, 0, 0, 0.4);
         padding-bottom: 20px;
+        
     }
     i{
         font-size: 20px
     }
     h3{
-        font-size: 1.5vw;
+        font-size: 1.8vw;
     }
    
     </style>
@@ -172,9 +178,9 @@
     
 </div>
 <br>
-<div class="container text-center" style="color: white">
-    <div class="row">
-        <div class="col-xs-2 box">
+<div id='expand' class="container-fluid text-center" style="color: white; display: none; margin: 10px">
+    <div  class="row">
+        <div  class="col-xs-2 box">
             <h3 id='next'>next</h3>
             <p id='next_max' style="font-size: 20px"></p>
             <p id='next_min'></p>
