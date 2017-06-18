@@ -1,0 +1,85 @@
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<link rel="EditURI" type="application/rsd+xml" href="//www.mediawiki.org/w/api.php?action=rsd" />
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script>
+    $(document).ready(function(){
+       $('input').keypress(function(){
+        var typing =  $('#search').val();
+        var urel = 'https://en.wikipedia.org/w/api.php?action=opensearch&search='+typing+'&format=json';
+        $.ajax({
+            url: urel, dataType: 'jsonp',
+            success: function(sugg){
+                console.log(sugg)
+                $('#sug1').attr('value',sugg[1][0])
+                $('#sug2').attr('value',sugg[1][1])
+                $('#sug3').attr('value',sugg[1][2])
+                $('#sug4').attr('value',sugg[1][3])
+                $('#sug5').attr('value',sugg[1][4])
+                $('#sug6').attr('value',sugg[1][5])
+            }
+        })
+        })
+        
+    function search (){
+            $('#results').empty();
+            $('#results').fadeOut()
+            var search_word = $('#search').val();
+            var a = 'https://en.wikipedia.org/w/api.php?action=opensearch&search='+search_word+'&format=json';
+            
+            $.ajax({
+                url : a,
+                dataType: 'jsonp',
+                success: function(data){
+                    console.log(data);
+                    $('#top').animate({"margin-top": "0.7%", "margin-bottom":"1.5%"}, 500)
+                    for (var i =1; i< data[1].length; i++) {
+                        $('#results').append('<div class="well"><h3><a target="_blank" href="'+ data[3][i]+ '">'+data[1][i]+'</a></h3><p>'+data[2][i]+'</p></div>');
+                        $('#results').fadeIn()
+                        $('body').attr('style', 'background-image: url()')
+                                           
+                    }
+                
+                }
+            });
+        }
+    
+        $('#sub').click(function(){
+            search()
+        });
+        $('input').keydown(function(event){
+            if (event.which===13){
+            search()
+            }
+        })
+    });
+    
+</script>
+<style>
+   body{
+       background-image: url(http://ozline.com/graphics/wikipedia.gif);
+        background-repeat: no-repeat;
+        background-position: center;
+        background-position-y: 20%
+   }
+</style>
+
+<body>
+<div id='top' class="container text-center" style="margin-top: 27%">
+    <h1>Wiki search</h1>
+    <h4><a href="https://en.wikipedia.org/wiki/Special:Random" target="_blank">Random article</a></h4>
+    <input id='search' list="datalist1" size="30">
+    <datalist id='datalist1'>
+        <option id="sug1" value=""></option>
+        <option id='sug2' value=""></option>
+        <option id='sug3' value=""></option>
+        <option id="sug4" value=""></option>
+        <option id='sug5' value=""></option>
+        <option id='sug6' value=""></option>
+    </datalist>
+    <button id="sub">Search</button>
+</div>
+
+<div id='results' class="container" style="display: none">
+</div>
+</body>
