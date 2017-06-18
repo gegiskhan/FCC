@@ -6,22 +6,51 @@
 
 <script>
     $(document).ready(function(){
-        
+    // nothing special here    
     var lat = ''
     var long = ''
     var urel = 'https://api.darksky.net/forecast/490e02d25af60d567f302f64df28e049/';
-    
-    
+    //get suggest from typing
+    $('input').keydown(function(){
+        var typing =$('#loc').val()
+        $.ajax({
+            url: 'https://maps.googleapis.com/maps/api/geocode/json?address=' + typing,
+            success:function(sugg){
+                $('#sug1').attr('value',sugg.results[0].formatted_address)
+                
+            }
+    })
+    })
+    //auto detect location    
     if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(function(position) {
         lat = position.coords.latitude
         long = position.coords.longitude
         urel =urel + lat + ',' + long + '?units=si'
+        fore()
+        })}
     
+    $('#sub').click(function(){
+        var loc = $('#loc').val();
+        $.ajax({
+            url: 'https://maps.googleapis.com/maps/api/geocode/json?address=' + loc,
+            success:function(x){
+                lat = x.results[0].geometry.location.lat
+                long = x.results[0].geometry.location.lng
+                urel = 'https://api.darksky.net/forecast/490e02d25af60d567f302f64df28e049/';
+                urel = urel + lat + ',' + long + '?units=si'
+        fore()
+            }
+        });
+    });
+
+
+    function fore(){
         $.ajax({
             url: 'https://maps.googleapis.com/maps/api/geocode/json?latlng='+ lat+','+long+'&sensor=true',
             success: function(json){
                 $('#location').html(json.results[1].formatted_address)
+                console.log(json.status)
             }
         });
     
@@ -29,7 +58,7 @@
             url: urel,
             dataType: 'jsonp',
             success: function(data) {
-                $('#open').animate({width: '40%'}, 1300);
+                $('#open').animate({maxWidth: '400px'}, 1300);
                 
                 $('#forecast').html(data.currently.summary);
                 console.log(urel);
@@ -100,7 +129,7 @@
                 $('#change').click(function(){
                    if ($('#temp').text().indexOf('C')>-1){
                         $('#temp').html(temp*9/5+32 + '&deg;F');
-                        $('#infor').html('Feels like: ' + (temp*9/5+32) +'&deg;F' + ' | ' + 'Wind: ' + data.currently.windSpeed + ' m/s' + ' | ' + 'Humidity: ' + data.currently.humidity*100 +'%');
+                        $('#infor').html('Feels like: ' + (temp*9/5+32) +'&deg;F' + '&emsp;&nbsp;' + 'Wind: ' + data.currently.windSpeed + ' m/s' + '&emsp;&nbsp;' + 'Humidity: ' + data.currently.humidity*100 +'%');
                         $('#change').text('C');
                         $('#next_max').html(Math.floor(data.daily.data[1].temperatureMax*9/5+32));
                         $('#next_min').html(Math.floor(data.daily.data[1].temperatureMin*9/5+32));
@@ -116,7 +145,7 @@
                         $('#next5_min').html(Math.floor(data.daily.data[6].temperatureMin*9/5+32));
                    }else{
                         $('#temp').html(Math.floor(temp) + '&deg;C');
-                        $('#infor').html('Feels like: ' + temp +'&deg;C' + ' | ' + 'Wind: ' + data.currently.windSpeed + ' m/s' + ' | ' + 'Humidity: ' + data.currently.humidity*100 +'%');
+                        $('#infor').html('Feels like: ' + temp +'&deg;C' + '&emsp;&nbsp;' + 'Wind: ' + data.currently.windSpeed + ' m/s' + '&emsp;&nbsp;' + 'Humidity: ' + data.currently.humidity*100 +'%');
                         $('#change').text('F');
                         $('#next_max').html(Math.floor(data.daily.data[1].temperatureMax));
                         $('#next_min').html(Math.floor(data.daily.data[1].temperatureMin));
@@ -138,7 +167,7 @@
             }   
 
         })
-        })};
+        }
     });
         
 </script>
@@ -149,7 +178,6 @@
         background-size: cover;
         background-repeat: no-repeat;
         background-position: center;
-    
     }
     .box {
         background-color: rgba(0, 0, 0, 0.4);
@@ -166,6 +194,13 @@
     </style>
 
 <body>
+    <div class="container text-center">
+    <input id='loc' type="text" list="suggest" placeholder="Enter a place">
+    <datalist id='suggest'>
+        <option id="sug1" value=""></option>
+    </datalist>
+    <button id="sub">Search</button>
+</div>
 <div id='open' class="container text-center" style="background-color: rgba(0, 0, 0, 0.5); color: white; margin-top: 30px;">
     
     <p id='location'>Location</p><br>
