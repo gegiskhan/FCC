@@ -1,0 +1,75 @@
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+
+<script>
+    function press(num) {
+        $('#show').append(num)
+        if (['0', '+'].indexOf($('#display').text()[0]) >=0 ) {
+            $('#display').text(num)
+        }
+        else {
+            $('#display').append(num)
+        }
+    }
+
+    function plus() {
+        if ($('#display').text() !== '+') {
+            x = $('#display').text()
+        }
+        if ($('#show').text()[$('#show').text().length - 1] !== '+') {
+            $('#show').append('+')
+        }    
+    }
+    $(document).ready(function () {
+        console.log($('#display').text())
+        $('#clear').click(function () {
+            $('#show').empty()
+            $('#display').text(0)
+        })
+        $('#num1').click(function () {
+            press(1)
+        })
+
+        $('#num2').click(function () {
+            press(2)
+
+        })
+        $('#num3').click(function () {
+            press(3)
+        })
+        $('#plus').click(function () {
+            plus()
+            console.log(x)
+
+            $('#display').text('+')
+        })
+        $('#result').click(function () {
+            y = $('#display').text()
+            console.log(y)
+            result = parseInt(x, 10) + parseInt(y, 10)
+            $('#display').text(result)
+            $('#show').append('=', result)
+        })
+    })
+
+</script>
+
+<style>
+    .larger {
+        font-size: 20px;
+        padding: 30px;
+    }
+</style>
+<div class="container text-center">
+    <div>
+        <p id='show'></p>
+        <h1 id='display'>0</h1>
+    </div>
+    <button class="larger" id="clear">CE</button>
+    <button class="larger" id='num1'>1</button>
+    <button class="larger" id='num2'>2</button>
+    <button class="larger" id='num3'>3</button>
+    <button id='plus' class='larger'>+</button>
+    <button id='sub' class='larger'>-</button>
+    <button class="larger" id="result">=</button>
+</div>
