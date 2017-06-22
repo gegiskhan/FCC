@@ -5,56 +5,63 @@
     x = []
     flag = 'replace'
     oper_flag = 1
+    show_flag=0
+    function truncate (str) {
+        for (var i = str.length-1; i>=0; i--){
+            if (str[i] == oper) {
+                return str.slice(0, i+1)
+            }
+        }
+        $('#show').empty()
+    }
     function press(num) {
-
-        $('#show').append(num)
+        if (show_flag == 1) {
+            $('#show').text(num)
+        }else {$('#show').append(num)}
 
         if (flag == 'replace') {//replace display
             $('#display').text(num)
         }
         else {// or append display
             $('#display').append(num)
-
-        } 
+        }
         flag = 'append'
         oper_flag = 1
+        show_flag = 0
     }
 
-    function plus(operator) {
-        if (oper_flag == 1){
-        flag = 'replace'
-        oper = operator
-        var numOnScreen = $('#display').text()
-        x.push(+numOnScreen)
-        console.log(x)
-        if (oper == '+' ) {
-            l = x.reduce(function (acc, curr) { return acc + curr })
-            if ($('#show').text()[$('#show').text().length - 1] !== '+') {// make sure no more plus in show
-                $('#show').append('+')
-                
-            }
+    function action(operator) {
+        show_flag=0
+        if (oper_flag == 1) {
+            flag = 'replace'
+            oper = operator
+            x.push($('#display').text())
+            x.push(operator)
+            $('#show').append(operator)
+            console.log('X: ', x)
+            temp = x.slice()
+            temp.pop()
+            console.log('temp: ', temp)
+            $('#display').text(eval(temp.join('')))
+            oper_flag = 0
         }
-        else if (oper == '-') {
-            l = x.reduce(function (acc, curr) { return acc - curr })
-
-            if ($('#show').text()[$('#show').text().length - 1] !== '-') {
-                $('#show').append('-')
-            }
-        }
-        $('#display').text(l)
-        }
-        oper_flag = 0
-
-
     }
 
     $(document).ready(function () {
-        console.log(eval('1+3'))
         $('#clear').click(function () {
             $('#show').empty()
             $('#display').text(0)
             x = []
-            flag='replace'
+            flag = 'replace'
+            show_flag = 0
+        })
+        $('#clear_display').click(function () {
+            var trunc = truncate($('#show').text())
+            $('#show').text(trunc)
+            $('#display').text(0)
+            flag = 'replace'
+            
+           
         })
         $('#num1').click(function () {
             press(1)
@@ -68,23 +75,23 @@
             press(3)
         })
         $('#plus').click(function () {
-            plus('+')
-            console.log('l: ', l)
+            action('+')
         })
         $('#sub').click(function () {
-            plus('-')
-            console.log('l: ', l)
+            action('-')
+        })
+        $('#mul').click(function () {
+            action('*')
         })
         $('#result').click(function () {
-            y = $('#display').text()
-            console.log('y: ', y)
-            result =eval($('#show').text())
-            //if (oper == '+') { result = parseInt(l, 10) + parseInt(y, 10) }
-            //else if (oper == '-') { result = parseInt(l, 10) - parseInt(y, 10) }
-            $('#display').text(result)
-            $('#show').empty()
+            x.push($('#display').text())
+            //result = eval($('#show').text())
+            $('#display').text(eval(x.join('')))
+            $('#show').text('')
             x = []
             flag = 'replace'
+            oper_flag = 1
+            show_flag = 1
         })
     })
 
@@ -95,17 +102,27 @@
         font-size: 20px;
         padding: 30px;
     }
+    .dark {
+        background-color: #777;
+    }
+    .light{
+        background-color: whitesmoke;
+        
+    }
 </style>
-<div class="container text-center">
-    <div>
+<div class="container text-center dark">
+    <div class='light'>
         <p id='show'></p>
         <h1 id='display'>0</h1>
     </div>
-    <button class="larger" id="clear">CE</button>
+    <button class="larger" id="clear_display">CE</button>
+    <button class="larger" id="clear">C</button>
     <button class="larger" id='num1'>1</button>
     <button class="larger" id='num2'>2</button>
     <button class="larger" id='num3'>3</button>
+    <br>
     <button id='plus' class='larger'>+</button>
+    <button id='mul' class='larger'>x</button>
     <button id='sub' class='larger'>-</button>
     <button class="larger" id="result">=</button>
 </div>
