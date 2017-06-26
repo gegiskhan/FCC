@@ -9,10 +9,10 @@
         min = Math.floor(eval(a / 60))
         sec = eval(a % 60)
         $('#start').click(function () {
-
+            
             if (flag == 1) {
                 x = setInterval(function () {
-
+                   
                     if (sec == 0 && min == 0) {
                         if ($('#name').text() == 'Session') {
                             $('#name').text('Break')
@@ -20,15 +20,16 @@
                             a = eval(b * 60)
                             min = Math.floor(eval(a / 60))
                             sec = eval(a % 60)
+                            $('#child').attr('style', 'height: 300px')
+                            $('#child').attr('style', 'background-color: #9365B8')
                         } else {
                             $('#name').text('Session')
                             b = $('#set_session').text()
                             a = eval(b * 60)
                             min = Math.floor(eval(a / 60))
                             sec = eval(a % 60)
+                            $('#child').attr('style', 'height: 300px')
                         }
-
-
                     }
                     else if (sec == 0) {
                         min = min - 1
@@ -37,6 +38,7 @@
                     else {
                         sec = sec - 1
                     }
+                     $('#child').slideUp(min*60*1000 + sec*1000 )
                     //display area
                     if (sec < 10) { $('#count').text(min + ':' + '0' + sec) }
                     if (min < 10) { $('#count').text('0' + min + ':' + sec) }
@@ -44,7 +46,9 @@
                     if (sec >= 10 && min >= 10) { $('#count').text(min + ':' + sec) }
                 }, 1000)
                 flag = 0
+                
             } else {
+                $('#child').stop(true)
                 clearInterval(x)
                 flag = 1
             }
@@ -63,6 +67,7 @@
                 sec = eval(a % 60)
             }
         })
+
         $('#sub').click(function () {
             if (flag == 1 && $('#name').text() == 'Session') {
                 var xx = $('#set_session').text()
@@ -118,27 +123,25 @@
         border-radius: 50%;
         border: 2px solid white;
         color: white;
-        background-color: #666;
+        background-color: #777;
+        z-index: 1;
     }
 
-    #start::before {
-        content: '';
+    #child {
         position: absolute;
-        background-color: rgba(0, 0, 0, 0.5);
+        background-color: #61BD6D;
         width: 100%;
         bottom: 0;
         left: 0;
-        animation: wipe forwards;
-        animation-duration: 0;
+        height: 300px;
+        z-index: -1;
     }
 
-    @keyframes wipe {
-        0% {
-            height: 0
-        }
-        100% {
-            height: 100%
-        }
+    .my-button{
+        background-color: #666;
+        padding: 10px;
+        border: none;
+        font-size: 23px;
     }
 </style>
 
@@ -147,21 +150,22 @@
     <div class="row">
         <div class="col-xs-6">
             <h2>Set Session</h2>
-            <button id='sub'>-</button>
-            <h3 id='set_session' style="display: inline">25</h3>
-            <button id='plus'>+</button>
+            <button id='sub' class='my-button'>-</button>
+            <h3 id='set_session' style="display: inline">0.1</h3>
+            <button id='plus' class='my-button'>+</button>
         </div>
         <div class="col-xs-6">
             <h2>Set Break</h2>
-            <button id='sub_break'>-</button>
+            <button id='sub_break'  class='my-button'>-</button>
             <h3 id='set_break' style="display: inline">0.1</h3>
-            <button id='plus_break'>+</button>
+            <button id='plus_break' class='my-button'>+</button>
         </div>
 
     </div>
     <br>
     <button id='start'>
-        <h1 id='name' >Session</h1>
+        <div id = 'child'></div>
+        <h1 id='name'>Session</h1>
         <h1 id='count'>0.1</h1>
     </button>
 </div>
