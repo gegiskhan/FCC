@@ -1,0 +1,222 @@
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+
+<script>
+    function to_page(from, to) {
+        $(from).css('display', 'none')
+        $(to).css('display', 'block')
+    }
+    function ai_move(letter) {
+        possible_move = []
+        for (var i = 1; i < 10; i++) {
+            if ($('#' + i).html() == '&nbsp;') {
+                possible_move.push('#' + i)
+            }
+        }
+        random_move = Math.floor(Math.random() * possible_move.length)
+        $(possible_move[random_move]).text(letter)
+    }
+    function reset_board() {
+        for (var i = 1; i < 10; i++) {
+            if ($('#' + i).html() !== '&nbsp;') {
+                $('#' + i).html('&nbsp;')
+            }
+        }
+        $('.cell').css('background-color', 'whitesmoke')
+        $('.cell').prop('disabled', false)
+    }
+    function check_win(letter) {
+        if (($('#1').text() == letter && $('#2').text() == letter && $('#3').text() == letter) ||
+            ($('#4').text() == letter && $('#5').text() == letter && $('#6').text() == letter) ||
+            ($('#7').text() == letter && $('#8').text() == letter && $('#9').text() == letter) ||
+            ($('#1').text() == letter && $('#5').text() == letter && $('#9').text() == letter) ||
+            ($('#3').text() == letter && $('#5').text() == letter && $('#7').text() == letter) ||
+            ($('#1').text() == letter && $('#4').text() == letter && $('#7').text() == letter) ||
+            ($('#2').text() == letter && $('#5').text() == letter && $('#8').text() == letter) ||
+            ($('#3').text() == letter && $('#6').text() == letter && $('#9').text() == letter)) { return true }
+    }
+    function check_tie() {
+        var count = 0
+        for (var i = 1; i < 10; i++) {
+            if ($('#' + i).html() !== '&nbsp;') {
+                count += 1
+            }
+        } if (count == 9) {
+            return true
+        }
+    }
+    function random_choice(){
+        var rand = Math.floor(Math.random()*2)
+        return rand
+    }
+    function change_turn(player_list) {
+        if (turn == player_list[0]) {
+            turn = player_list[1]
+            $('#turn1').css('display', 'none')
+            $('#turn2').css('display', 'block')
+             $('#turn2').text(player_list[1])
+        }
+        else {
+            turn = player_list[0]
+            $('#turn1').css('display', 'block')
+            $('#turn1').text(player_list[0])
+            $('#turn2').css('display', 'none')
+        }
+    }
+    $(document).ready(function () {
+        $('.choose').click(function () {
+            to_page('#first', '#second')
+            if ($(this).text() == 'One player') {
+                player_list = ['Player', 'Computer']
+            }
+            else {
+                player_list = ['Player 1', 'Player 2']
+            }
+            console.log(player_list)
+        })
+        
+        $('#back').click(function () {
+            to_page('#second', '#first')
+        })
+
+        $('.letter').click(function () {
+            if ($(this).text() == 'X') {
+                player_letter = 'X'
+                ai_letter = 'O'
+            } else {
+                player_letter = 'O'
+                ai_letter = 'X'
+            }
+            to_page('#second', '#third')
+            turn = player_list[random_choice()]
+            change_turn(player_list)
+            console.log('turn: ', turn)
+        })
+
+        /*$('.cell').click(function () {
+            if ($(this).html() == '&nbsp;' && turn == 'player') {
+                
+                $(this).text(player_letter)
+                if (check_win(player_letter)) {
+                    $('#stat').text('PLayer WIN')
+                    $('.cell').css('background-color', '#aaa')
+                    $('#fuck').slideDown(1000)
+                    $('.cell').prop('disabled', true)
+                }
+                else {
+                    change_turn()
+                    console.log(turn)
+                    setTimeout( function () {
+                        ai_move(ai_letter)
+                        if (check_win(ai_letter)) {
+                        $('#stat').text('Computer WIN')
+                        $('.cell').css('background-color', '#aaa')
+                        $('#fuck').slideDown(1000)
+                        $('.cell').prop('disabled', true)
+                        }
+                        else {change_turn()}
+                    }, 500)
+                    console.log(turn)
+                }
+            }
+            if (check_tie()) {
+                $('#stat').text('TIE')
+                $('.cell').css('background-color', '#aaa')
+                $('#fuck').slideDown(1000)
+                $('.cell').prop('disabled', true)
+            }
+        }) */
+        $('#again').click(function () {
+            $('#turn1').css('display', 'none')
+            $('#turn2').css('display', 'none')
+            to_page('#third', '#first')
+            $('#fuck').css('display', 'none')
+            reset_board()
+            
+
+        })
+    })
+
+</script>
+
+
+
+
+
+<style>
+    body {
+        background-color: #444;
+    }
+
+    div {
+        background-color: #777;
+        width: 400px;
+        height: 400px;
+        color: white;
+        margin-left: auto;
+        margin-right: auto;
+        margin-bottom: 0;
+        text-align: center;
+    }
+
+    .button-noborder {
+        border: none;
+        font-size: 30px;
+        background-color: #777;
+        margin: 10px;
+    }
+
+    .button-noborder:hover {
+        border: 2px dashed whitesmoke;
+    }
+
+    .border {
+        border: 2px solid white;
+    }
+
+    .cell {
+        height: 30%;
+        width: 32%;
+        background-color: whitesmoke;
+        color: black;
+        font-size: 50px;
+        font-family: monospace;
+    }
+</style>
+     <div  id='infor' style="margin-top: 0; height: 50px; background-color: #444">
+        <p id='turn1' style="float: left; display: none; margin-top: 25px;">Player turn</p>
+        <p id = 'turn2' style="float: right; display: none; margin-top: 25px">Computer turn</p>
+    </div>
+
+    <div id='first'>
+        <h1>How do u want to play?</h1>
+        <button class="button-noborder choose">One player</button>
+        <button class="button-noborder choose">Two player</button>
+    </div>
+
+    <div id='second' style="display: none">
+        <h1>What do u perfer</h1>
+        <button class="button-noborder letter">X</button>
+        <button class="button-noborder letter">O</button>
+        <br>
+        <button id='back' class="button-noborder">Back</button>
+    </div>
+
+    <div id="third" style="display: none">
+        <p id='stat'>Game board</p>
+        <button id='1' class='cell'>&nbsp;</button>
+        <button id='2' class='cell'>&nbsp;</button>
+        <button id='3' class='cell'>&nbsp;</button>
+
+        <button id='4' class='cell'>&nbsp;</button>
+        <button id='5' class='cell'>&nbsp;</button>
+        <button id='6' class='cell'>&nbsp;</button>
+
+        <button id='7' class='cell'>&nbsp;</button>
+        <button id='8' class='cell'>&nbsp;</button>
+        <button id='9' class='cell'>&nbsp;</button>
+    </div>
+    <div id='fuck' style="display: none; height: 80px; margin-top: 0;">
+        <h3 style="margin-top: 0">wanna play again?</h3>
+        <button id='again'>yes</button>
+    </div>
