@@ -13,9 +13,37 @@
                 possible_move.push('#' + i)
             }
         }
+        console.log('possible_move: ', possible_move)
+        block_move = []
+        win_move = ''
         random_move = Math.floor(Math.random() * possible_move.length)
+        for (var i in possible_move) {
+            var store = $(possible_move[i]).text()
+            $(possible_move[i]).text(player0_letter)
+            if (check_win(player0_letter)) {
+                block_move.push(possible_move[i])
+            }
+            $(possible_move[i]).text(store)
+        }
+        for (var i in possible_move) {
+            $(possible_move[i]).text(player1_letter)
+            if (check_win(player1_letter)) {
+                win_move = possible_move[i]
+            }
+            $(possible_move[i]).html('&nbsp;')
+        }
+        if (win_move) {
+            $(win_move).text(letter)
+        }
+        else if (block_move.toString() !== [].toString()) {
+            console.log('block_move: ', block_move)
+            $(block_move[0]).text(letter)
+        }
+        else {
+            $(possible_move[random_move]).text(letter)
+        }
 
-        $(possible_move[random_move]).text(letter)
+
     }
     function reset_board() {
         for (var i = 1; i < 10; i++) {
@@ -80,8 +108,8 @@
                 player_list = ['Player 1', 'Player 2']
                 two_player = true
             }
-            console.log(player_list)
-            console.log('two_player:', two_player)
+            //console.log(player_list)
+            //console.log('two_player:', two_player)
         })
 
         $('#back').click(function () {
@@ -107,11 +135,11 @@
                 }, 1000)
 
             }
-            console.log('turn: ', turn)
-            if (two_player == false) {
+            //console.log('turn: ', turn)
+            if (!two_player) {
                 console.log('2player: ', two_player)
                 $('.cell').click(function () {
-                    if ($(this).html() == '&nbsp;' && turn == player_list[0]) {
+                    if ($(this).html() == '&nbsp;' && turn == 'Player') {
 
                         $(this).text(player0_letter)
                         if (check_win(player0_letter)) {
@@ -126,6 +154,7 @@
                             console.log(turn)
                         }
                         if (turn == 'Computer') {
+                            console.log('comp turn')
                             setTimeout(function () {
                                 ai_move(player1_letter)
                                 if (check_win(player1_letter)) {
@@ -139,26 +168,15 @@
                                     check_tie()
                                 }
                             }, 500)
-                        } else if (turn == 'Player 2') {
-                            if ($(this).html() == '&nbsp;') {
-                                if (check_win(player1_letter)) {
-                                    $('#stat').text('Player 2 WIN')
-                                    $('.cell').css('background-color', '#aaa')
-                                    $('#fuck').slideDown(1000)
-                                    $('.cell').prop('disabled', true)
-                                } else {
-                                    check_tie()
-                                    change_turn(player_list)
-                                }
-                            }
                         }
                     }
                 })
-            } else {
+            }
+            else {
                 console.log('two_player: ', two_player)
                 $('.cell').click(function () {
 
-                    if ($(this).html() == '&nbsp;' && turn == player_list[0]) {
+                    if ($(this).html() == '&nbsp;' && turn == 'Player 1') {
                         $(this).text(player0_letter)
                         if (check_win(player0_letter)) {
                             $('#stat').text('Player 1 WIN')
@@ -168,6 +186,7 @@
                         } else {
                             check_tie()
                             change_turn(player_list)
+                            console.log(turn)
                         }
                     } else if ($(this).html() == '&nbsp;' && turn == 'Player 2') {
                         $(this).text(player1_letter)
