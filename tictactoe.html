@@ -14,6 +14,7 @@
             }
         }
         random_move = Math.floor(Math.random() * possible_move.length)
+
         $(possible_move[random_move]).text(letter)
     }
     function reset_board() {
@@ -80,6 +81,7 @@
                 two_player = true
             }
             console.log(player_list)
+            console.log('two_player:', two_player)
         })
 
         $('#back').click(function () {
@@ -106,8 +108,8 @@
 
             }
             console.log('turn: ', turn)
-            console.log(player_list)
-            if (!two_player) {
+            if (two_player == false) {
+                console.log('2player: ', two_player)
                 $('.cell').click(function () {
                     if ($(this).html() == '&nbsp;' && turn == player_list[0]) {
 
@@ -122,6 +124,8 @@
                             check_tie()
                             change_turn(player_list)
                             console.log(turn)
+                        }
+                        if (turn == 'Computer') {
                             setTimeout(function () {
                                 ai_move(player1_letter)
                                 if (check_win(player1_letter)) {
@@ -135,12 +139,25 @@
                                     check_tie()
                                 }
                             }, 500)
+                        } else if (turn == 'Player 2') {
+                            if ($(this).html() == '&nbsp;') {
+                                if (check_win(player1_letter)) {
+                                    $('#stat').text('Player 2 WIN')
+                                    $('.cell').css('background-color', '#aaa')
+                                    $('#fuck').slideDown(1000)
+                                    $('.cell').prop('disabled', true)
+                                } else {
+                                    check_tie()
+                                    change_turn(player_list)
+                                }
+                            }
                         }
                     }
-
                 })
             } else {
+                console.log('two_player: ', two_player)
                 $('.cell').click(function () {
+
                     if ($(this).html() == '&nbsp;' && turn == player_list[0]) {
                         $(this).text(player0_letter)
                         if (check_win(player0_letter)) {
@@ -148,18 +165,18 @@
                             $('.cell').css('background-color', '#aaa')
                             $('#fuck').slideDown(1000)
                             $('.cell').prop('disabled', true)
-                        }else {
+                        } else {
                             check_tie()
                             change_turn(player_list)
                         }
-                    }else if($(this).html() == '&nbsp;' && turn == player_list[1]){
+                    } else if ($(this).html() == '&nbsp;' && turn == 'Player 2') {
                         $(this).text(player1_letter)
                         if (check_win(player1_letter)) {
                             $('#stat').text('Player 2 WIN')
                             $('.cell').css('background-color', '#aaa')
                             $('#fuck').slideDown(1000)
                             $('.cell').prop('disabled', true)
-                        }else {
+                        } else {
                             check_tie()
                             change_turn(player_list)
                         }
@@ -177,22 +194,8 @@
             reset_board()
             $('#stat').text('Game board')
 
-
         })
     })
-    for (var i = 0; i < 10; i++) {
-        if (turn == player_list[0]) {
-            $('.cell').click(function () {
-                if ($(this).html == '&nbsp;') {
-                    $(this).text(player0_letter)
-                    change_turn(player_list)
-                }
-            })
-        } else {
-            ai_move(player1_letter)
-            change_turn(player_list)
-        }
-    }
 
 </script>
 
