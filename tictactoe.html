@@ -45,8 +45,8 @@
             return true
         }
     }
-    function random_choice(){
-        var rand = Math.floor(Math.random()*2)
+    function random_choice() {
+        var rand = Math.floor(Math.random() * 2)
         return rand
     }
     function change_turn(player_list) {
@@ -54,7 +54,7 @@
             turn = player_list[1]
             $('#turn1').css('display', 'none')
             $('#turn2').css('display', 'block')
-             $('#turn2').text(player_list[1])
+            $('#turn2').text(player_list[1])
         }
         else {
             turn = player_list[0]
@@ -63,58 +63,70 @@
             $('#turn2').css('display', 'none')
         }
     }
+    console.log('not ready')
     $(document).ready(function () {
+        fucking = false
         $('.choose').click(function () {
             to_page('#first', '#second')
             if ($(this).text() == 'One player') {
                 player_list = ['Player', 'Computer']
+                two_player = false
             }
             else {
                 player_list = ['Player 1', 'Player 2']
+                two_player = true
             }
             console.log(player_list)
         })
-        
+
         $('#back').click(function () {
             to_page('#second', '#first')
         })
 
         $('.letter').click(function () {
             if ($(this).text() == 'X') {
-                player_letter = 'X'
-                ai_letter = 'O'
+                player0_letter = 'X'
+                player1_letter = 'O'
             } else {
-                player_letter = 'O'
-                ai_letter = 'X'
+                player0_letter = 'O'
+                player1_letter = 'X'
             }
             to_page('#second', '#third')
             turn = player_list[random_choice()]
             change_turn(player_list)
-            console.log('turn: ', turn)
-        })
-
-        /*$('.cell').click(function () {
-            if ($(this).html() == '&nbsp;' && turn == 'player') {
+            //turn = 'Player'
+            if (turn == 'Computer') {
+                setTimeout(function(){
+                    ai_move(player1_letter)
+                    change_turn(player_list)
+                }, 1000)
                 
-                $(this).text(player_letter)
-                if (check_win(player_letter)) {
+            }
+            console.log('turn: ', turn)
+            console.log(player_list)
+
+            $('.cell').click(function () {
+            if ($(this).html() == '&nbsp;' && turn == player_list[0]) {
+
+                $(this).text(player0_letter)
+                if (check_win(player0_letter)) {
                     $('#stat').text('PLayer WIN')
                     $('.cell').css('background-color', '#aaa')
                     $('#fuck').slideDown(1000)
                     $('.cell').prop('disabled', true)
                 }
                 else {
-                    change_turn()
+                    change_turn(player_list)
                     console.log(turn)
-                    setTimeout( function () {
-                        ai_move(ai_letter)
-                        if (check_win(ai_letter)) {
-                        $('#stat').text('Computer WIN')
-                        $('.cell').css('background-color', '#aaa')
-                        $('#fuck').slideDown(1000)
-                        $('.cell').prop('disabled', true)
+                    setTimeout(function () {
+                        ai_move(player1_letter)
+                        if (check_win(player1_letter)) {
+                            $('#stat').text('Computer WIN')
+                            $('.cell').css('background-color', '#aaa')
+                            $('#fuck').slideDown(1000)
+                            $('.cell').prop('disabled', true)
                         }
-                        else {change_turn()}
+                        else { change_turn(player_list) }
                     }, 500)
                     console.log(turn)
                 }
@@ -125,17 +137,34 @@
                 $('#fuck').slideDown(1000)
                 $('.cell').prop('disabled', true)
             }
-        }) */
+        }) 
+
+        })
+        
         $('#again').click(function () {
             $('#turn1').css('display', 'none')
             $('#turn2').css('display', 'none')
             to_page('#third', '#first')
             $('#fuck').css('display', 'none')
             reset_board()
-            
+            $('#stat').text('Game board')
+
 
         })
     })
+    for (var i = 0; i<10; i++) {
+        if (turn ==player_list[0]){
+            $('.cell').click(function(){
+                if ($(this).html == '&nbsp;') {
+                    $(this).text(player0_letter)
+                    change_turn(player_list)
+                }
+            })
+        }else {
+            ai_move(player1_letter)
+            change_turn(player_list)
+        }
+    }
 
 </script>
 
@@ -157,6 +186,7 @@
         margin-right: auto;
         margin-bottom: 0;
         text-align: center;
+        
     }
 
     .button-noborder {
@@ -183,40 +213,43 @@
         font-family: monospace;
     }
 </style>
-     <div  id='infor' style="margin-top: 0; height: 50px; background-color: #444">
-        <p id='turn1' style="float: left; display: none; margin-top: 25px;">Player turn</p>
-        <p id = 'turn2' style="float: right; display: none; margin-top: 25px">Computer turn</p>
-    </div>
 
-    <div id='first'>
-        <h1>How do u want to play?</h1>
-        <button class="button-noborder choose">One player</button>
-        <button class="button-noborder choose">Two player</button>
-    </div>
 
-    <div id='second' style="display: none">
-        <h1>What do u perfer</h1>
-        <button class="button-noborder letter">X</button>
-        <button class="button-noborder letter">O</button>
-        <br>
-        <button id='back' class="button-noborder">Back</button>
-    </div>
 
-    <div id="third" style="display: none">
-        <p id='stat'>Game board</p>
-        <button id='1' class='cell'>&nbsp;</button>
-        <button id='2' class='cell'>&nbsp;</button>
-        <button id='3' class='cell'>&nbsp;</button>
+<div id='infor' style="margin-top: 0; height: 50px; background-color: #444">
+    <p id='turn1' style="float: left; display: none; margin-top: 25px;">Player turn</p>
+    <p id='turn2' style="float: right; display: none; margin-top: 25px">Computer turn</p>
+</div>
 
-        <button id='4' class='cell'>&nbsp;</button>
-        <button id='5' class='cell'>&nbsp;</button>
-        <button id='6' class='cell'>&nbsp;</button>
+<div id='first'>
+    <h1>How do u want to play?</h1>
+    <button class="button-noborder choose">One player</button>
+    <button class="button-noborder choose">Two player</button>
+</div>
 
-        <button id='7' class='cell'>&nbsp;</button>
-        <button id='8' class='cell'>&nbsp;</button>
-        <button id='9' class='cell'>&nbsp;</button>
-    </div>
-    <div id='fuck' style="display: none; height: 80px; margin-top: 0;">
-        <h3 style="margin-top: 0">wanna play again?</h3>
-        <button id='again'>yes</button>
-    </div>
+<div id='second' style="display: none">
+    <h1>What do u perfer</h1>
+    <button class="button-noborder letter">X</button>
+    <button class="button-noborder letter">O</button>
+    <br>
+    <button id='back' class="button-noborder">Back</button>
+</div>
+
+<div id="third" style="display: none">
+    <p id='stat'>Game board</p>
+    <button id='1' class='cell'>&nbsp;</button>
+    <button id='2' class='cell'>&nbsp;</button>
+    <button id='3' class='cell'>&nbsp;</button>
+
+    <button id='4' class='cell'>&nbsp;</button>
+    <button id='5' class='cell'>&nbsp;</button>
+    <button id='6' class='cell'>&nbsp;</button>
+
+    <button id='7' class='cell'>&nbsp;</button>
+    <button id='8' class='cell'>&nbsp;</button>
+    <button id='9' class='cell'>&nbsp;</button>
+</div>
+<div id='fuck' style="display: none; height: 80px; margin-top: 0;">
+    <h3 style="margin-top: 0">wanna play again?</h3>
+    <button id='again'>yes</button>
+</div>
