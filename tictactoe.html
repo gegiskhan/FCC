@@ -34,6 +34,7 @@
             ($('#1').text() == letter && $('#4').text() == letter && $('#7').text() == letter) ||
             ($('#2').text() == letter && $('#5').text() == letter && $('#8').text() == letter) ||
             ($('#3').text() == letter && $('#6').text() == letter && $('#9').text() == letter)) { return true }
+
     }
     function check_tie() {
         var count = 0
@@ -42,7 +43,10 @@
                 count += 1
             }
         } if (count == 9) {
-            return true
+            $('#stat').text('TIE')
+            $('.cell').css('background-color', '#aaa')
+            $('#fuck').slideDown(1000)
+            $('.cell').prop('disabled', true)
         }
     }
     function random_choice() {
@@ -63,7 +67,6 @@
             $('#turn2').css('display', 'none')
         }
     }
-    console.log('not ready')
     $(document).ready(function () {
         fucking = false
         $('.choose').click(function () {
@@ -94,53 +97,78 @@
             to_page('#second', '#third')
             turn = player_list[random_choice()]
             change_turn(player_list)
-            //turn = 'Player'
+            //game starts from here
             if (turn == 'Computer') {
-                setTimeout(function(){
+                setTimeout(function () {
                     ai_move(player1_letter)
                     change_turn(player_list)
                 }, 1000)
-                
+
             }
             console.log('turn: ', turn)
             console.log(player_list)
+            if (!two_player) {
+                $('.cell').click(function () {
+                    if ($(this).html() == '&nbsp;' && turn == player_list[0]) {
 
-            $('.cell').click(function () {
-            if ($(this).html() == '&nbsp;' && turn == player_list[0]) {
-
-                $(this).text(player0_letter)
-                if (check_win(player0_letter)) {
-                    $('#stat').text('PLayer WIN')
-                    $('.cell').css('background-color', '#aaa')
-                    $('#fuck').slideDown(1000)
-                    $('.cell').prop('disabled', true)
-                }
-                else {
-                    change_turn(player_list)
-                    console.log(turn)
-                    setTimeout(function () {
-                        ai_move(player1_letter)
-                        if (check_win(player1_letter)) {
-                            $('#stat').text('Computer WIN')
+                        $(this).text(player0_letter)
+                        if (check_win(player0_letter)) {
+                            $('#stat').text('PLayer WIN')
                             $('.cell').css('background-color', '#aaa')
                             $('#fuck').slideDown(1000)
                             $('.cell').prop('disabled', true)
                         }
-                        else { change_turn(player_list) }
-                    }, 500)
-                    console.log(turn)
-                }
+                        else {
+                            check_tie()
+                            change_turn(player_list)
+                            console.log(turn)
+                            setTimeout(function () {
+                                ai_move(player1_letter)
+                                if (check_win(player1_letter)) {
+                                    $('#stat').text('Computer WIN')
+                                    $('.cell').css('background-color', '#aaa')
+                                    $('#fuck').slideDown(1000)
+                                    $('.cell').prop('disabled', true)
+                                }
+                                else {
+                                    change_turn(player_list)
+                                    check_tie()
+                                }
+                            }, 500)
+                        }
+                    }
+
+                })
+            } else {
+                $('.cell').click(function () {
+                    if ($(this).html() == '&nbsp;' && turn == player_list[0]) {
+                        $(this).text(player0_letter)
+                        if (check_win(player0_letter)) {
+                            $('#stat').text('Player 1 WIN')
+                            $('.cell').css('background-color', '#aaa')
+                            $('#fuck').slideDown(1000)
+                            $('.cell').prop('disabled', true)
+                        }else {
+                            check_tie()
+                            change_turn(player_list)
+                        }
+                    }else if($(this).html() == '&nbsp;' && turn == player_list[1]){
+                        $(this).text(player1_letter)
+                        if (check_win(player1_letter)) {
+                            $('#stat').text('Player 2 WIN')
+                            $('.cell').css('background-color', '#aaa')
+                            $('#fuck').slideDown(1000)
+                            $('.cell').prop('disabled', true)
+                        }else {
+                            check_tie()
+                            change_turn(player_list)
+                        }
+                    }
+                })
             }
-            if (check_tie()) {
-                $('#stat').text('TIE')
-                $('.cell').css('background-color', '#aaa')
-                $('#fuck').slideDown(1000)
-                $('.cell').prop('disabled', true)
-            }
-        }) 
 
         })
-        
+
         $('#again').click(function () {
             $('#turn1').css('display', 'none')
             $('#turn2').css('display', 'none')
@@ -152,15 +180,15 @@
 
         })
     })
-    for (var i = 0; i<10; i++) {
-        if (turn ==player_list[0]){
-            $('.cell').click(function(){
+    for (var i = 0; i < 10; i++) {
+        if (turn == player_list[0]) {
+            $('.cell').click(function () {
                 if ($(this).html == '&nbsp;') {
                     $(this).text(player0_letter)
                     change_turn(player_list)
                 }
             })
-        }else {
+        } else {
             ai_move(player1_letter)
             change_turn(player_list)
         }
@@ -186,7 +214,6 @@
         margin-right: auto;
         margin-bottom: 0;
         text-align: center;
-        
     }
 
     .button-noborder {
