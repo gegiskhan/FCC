@@ -3,8 +3,8 @@
 
 <script>
     function to_page(from, to) {
-        $(from).css('display', 'none')
-        $(to).css('display', 'block')
+        $(from).fadeOut(0)
+        $(to).fadeIn(600)
     }
     function ai_move(letter) {
         possible_move = []
@@ -40,7 +40,8 @@
             $(block_move[0]).text(letter)
         }
         else {
-            $(possible_move[random_move]).text(letter)
+            if (possible_move.indexOf('#5') !== -1) { $('#5').text(letter) }
+            else { $(possible_move[random_move]).text(letter) }
         }
 
 
@@ -85,15 +86,15 @@
     function change_turn(player_list) {
         if (turn == player_list[0]) {
             turn = player_list[1]
-            $('#turn1').css('display', 'none')
-            $('#turn2').css('display', 'block')
-            $('#turn2').text(player_list[1])
+            $('#turn1').fadeOut(0)
+            $('#turn2').fadeIn(500)
+            $('#turn2').text(player_list[1] + ' turn')
         }
         else {
             turn = player_list[0]
-            $('#turn1').css('display', 'block')
-            $('#turn1').text(player_list[0])
-            $('#turn2').css('display', 'none')
+            $('#turn1').fadeIn(500)
+            $('#turn1').text(player_list[0] + ' turn')
+            $('#turn2').fadeOut(0)
         }
     }
     $(document).ready(function () {
@@ -144,7 +145,7 @@
                         $(this).text(player0_letter)
                         if (check_win(player0_letter)) {
                             $('#stat').text('PLayer WIN')
-                            $('.cell').css('background-color', '#aaa')
+                            $('.cell').css('background-color', '#D1D5D8')
                             $('#fuck').slideDown(1000)
                             $('.cell').prop('disabled', true)
                         }
@@ -159,7 +160,7 @@
                                 ai_move(player1_letter)
                                 if (check_win(player1_letter)) {
                                     $('#stat').text('Computer WIN')
-                                    $('.cell').css('background-color', '#aaa')
+                                    $('.cell').css('background-color', '#D1D5D8')
                                     $('#fuck').slideDown(1000)
                                     $('.cell').prop('disabled', true)
                                 }
@@ -205,7 +206,7 @@
 
         })
 
-        $('#again').click(function () {
+        $('#reset').click(function () {
             $('#turn1').css('display', 'none')
             $('#turn2').css('display', 'none')
             to_page('#third', '#first')
@@ -213,6 +214,19 @@
             reset_board()
             $('#stat').text('Game board')
 
+        })
+        $('#again').click(function () {
+            $('#stat').text('Game board')
+            reset_board()
+            $('#fuck').slideUp(500)
+            turn = player_list[random_choice()]
+            change_turn(player_list)
+            if (turn == 'Computer') {
+                setTimeout(function () {
+                    ai_move(player1_letter)
+                    change_turn(player_list)
+                }, 1000)
+            }
         })
     })
 
@@ -224,11 +238,13 @@
 
 <style>
     body {
-        background-color: #444;
+        background-image: url(http://img.clipartall.com/clipart-background-timy-clip-art-background-1920_1200.jpg);
+        background-repeat: no-repeat;
+        background-size: cover;
     }
 
-    div {
-        background-color: #777;
+    .custom-div {
+        background-color: rgba(0, 0, 0, 0.6);
         width: 400px;
         height: 400px;
         color: white;
@@ -241,51 +257,63 @@
     .button-noborder {
         border: none;
         font-size: 30px;
-        background-color: #777;
+        background-color: rgba(0, 0, 0, 0);
         margin: 10px;
+        
     }
 
     .button-noborder:hover {
         border: 2px dashed whitesmoke;
-    }
-
-    .border {
-        border: 2px solid white;
+        border-radius: 10%;
     }
 
     .cell {
-        height: 30%;
+        height: 28%;
         width: 32%;
         background-color: whitesmoke;
         color: black;
         font-size: 50px;
         font-family: monospace;
+        margin-bottom: 5px;
+    }
+
+    .container {
+        width: 400px;
     }
 </style>
 
 
 
-<div id='infor' style="margin-top: 0; height: 50px; background-color: #444">
-    <p id='turn1' style="float: left; display: none; margin-top: 25px;">Player turn</p>
-    <p id='turn2' style="float: right; display: none; margin-top: 25px">Computer turn</p>
+<div class="container" id='infor' style="margin-top: 10px">
+    <div class="row" style="color: white">
+        <div  class="col-xs-6" >
+            <p id='turn1'  style="text-align: center;  margin: 0; font-size: 20px; background-color: #61BD6D"></p>
+
+        </div>
+        
+        <div  class="col-xs-6" >
+            <p id='turn2'  style="text-align: center;  margin: 0; font-size: 20px; background-color: #54acd2"></p>
+
+        </div>
+    </div>
 </div>
 
-<div id='first'>
-    <h1>How do u want to play?</h1>
+<div class="custom-div" id='first'>
+    <h1 style="margin-top: 0; padding: 40px 10px;">How do u want to play?</h1>
     <button class="button-noborder choose">One player</button>
     <button class="button-noborder choose">Two player</button>
 </div>
 
-<div id='second' style="display: none">
-    <h1>What do u perfer</h1>
-    <button class="button-noborder letter">X</button>
-    <button class="button-noborder letter">O</button>
+<div class="custom-div" id='second' style="display: none">
+    <h1 style="margin-top: 0; padding: 40px 10px;">What do u perfer</h1>
+    <button class="button-noborder letter" style="margin: 20px; padding: 10px 20px">X</button>
+    <button class="button-noborder letter" style="margin: 20px; padding: 10px 20px">O</button>
     <br>
-    <button id='back' class="button-noborder">Back</button>
+    <button id='back' class="button-noborder" style="margin-top: 30px;">Back</button>
 </div>
 
-<div id="third" style="display: none">
-    <p id='stat'>Game board</p>
+<div class="custom-div" id="third" style="display: none;">
+    <p id='stat' style="font-size: 30px">Game board</p>
     <button id='1' class='cell'>&nbsp;</button>
     <button id='2' class='cell'>&nbsp;</button>
     <button id='3' class='cell'>&nbsp;</button>
@@ -298,7 +326,8 @@
     <button id='8' class='cell'>&nbsp;</button>
     <button id='9' class='cell'>&nbsp;</button>
 </div>
-<div id='fuck' style="display: none; height: 80px; margin-top: 0;">
+<div class="custom-div" id='fuck' style="display: none; height: 80px; margin-top: 0;">
     <h3 style="margin-top: 0">wanna play again?</h3>
-    <button id='again'>yes</button>
+    <button id='again' class="button-noborder" style="font-size: 20px; margin: 0; margin-right: 10px">Yes</button>
+    <button id='reset' class="button-noborder" style="font-size: 20px; margin: 0; margin-left: 10px;">No</button>
 </div>
