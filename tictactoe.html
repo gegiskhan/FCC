@@ -1,5 +1,6 @@
 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<link href="https://netdna.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css" rel="stylesheet">
 
 <script>
     function to_page(from, to) {
@@ -241,6 +242,7 @@
         background-image: url(http://img.clipartall.com/clipart-background-timy-clip-art-background-1920_1200.jpg);
         background-repeat: no-repeat;
         background-size: cover;
+        font-family: "Comic Sans MS", cursive, sans-serif;
     }
 
     .custom-div {
@@ -252,6 +254,7 @@
         margin-right: auto;
         margin-bottom: 0;
         text-align: center;
+        border-radius: 2%;
     }
 
     .button-noborder {
@@ -273,12 +276,17 @@
         background-color: whitesmoke;
         color: black;
         font-size: 50px;
-        font-family: monospace;
         margin-bottom: 5px;
     }
 
     .container {
         width: 400px;
+    }
+    .choose{
+        margin: 20px;
+    }
+    .glyphicon{
+        font-size: 25px;
     }
 </style>
 
@@ -300,8 +308,8 @@
 
 <div class="custom-div" id='first'>
     <h1 style="margin-top: 0; padding: 40px 10px;">How do u want to play?</h1>
-    <button class="button-noborder choose">One player</button>
-    <button class="button-noborder choose">Two player</button>
+    <span class="glyphicon glyphicon-user"></span><button class="button-noborder choose">One player</button><br>
+    <span class="glyphicon glyphicon-user"></span><span class="glyphicon glyphicon-user"></span><button class="button-noborder choose">Two players</button>
 </div>
 
 <div class="custom-div" id='second' style="display: none">
@@ -309,7 +317,7 @@
     <button class="button-noborder letter" style="margin: 20px; padding: 10px 20px">X</button>
     <button class="button-noborder letter" style="margin: 20px; padding: 10px 20px">O</button>
     <br>
-    <button id='back' class="button-noborder" style="margin-top: 30px;">Back</button>
+    <button id='back' class="button-noborder" style="margin-top: 30px;"><span class="glyphicon glyphicon-arrow-left"></span> Back</button>
 </div>
 
 <div class="custom-div" id="third" style="display: none;">
