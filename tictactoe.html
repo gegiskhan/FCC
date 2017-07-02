@@ -57,6 +57,13 @@
         $('.cell').prop('disabled', false)
     }
     function check_win(letter) {
+        for(var i=1; i<10; i++){
+            if ($('#'+i).text()=='X'){
+                $('#'+i).css('color','green')
+            }else if ($('#'+i).text()=='O'){
+                $('#'+i).css('color','red')
+            }
+        }
         if (($('#1').text() == letter && $('#2').text() == letter && $('#3').text() == letter) ||
             ($('#4').text() == letter && $('#5').text() == letter && $('#6').text() == letter) ||
             ($('#7').text() == letter && $('#8').text() == letter && $('#9').text() == letter) ||
@@ -85,6 +92,7 @@
         return rand
     }
     function change_turn(player_list) {
+        
         if (turn == player_list[0]) {
             turn = player_list[1]
             $('#turn1').fadeOut(0)
@@ -145,10 +153,11 @@
 
                         $(this).text(player0_letter)
                         if (check_win(player0_letter)) {
-                            $('#stat').text('PLayer WIN')
+                            $('#stat').text('PLayer WIN!')
                             $('.cell').css('background-color', '#D1D5D8')
                             $('#fuck').slideDown(1000)
                             $('.cell').prop('disabled', true)
+                            $('#player0_score').text(eval(+$('#player0_score').text()+1))
                         }
                         else {
                             check_tie()
@@ -160,16 +169,17 @@
                             setTimeout(function () {
                                 ai_move(player1_letter)
                                 if (check_win(player1_letter)) {
-                                    $('#stat').text('Computer WIN')
+                                    $('#stat').text('Computer WIN!')
                                     $('.cell').css('background-color', '#D1D5D8')
                                     $('#fuck').slideDown(1000)
                                     $('.cell').prop('disabled', true)
+                                    $('#player1_score').text(eval(+$('#player1_score').text()+1))
                                 }
                                 else {
                                     change_turn(player_list)
                                     check_tie()
                                 }
-                            }, 500)
+                            }, 1000)
                         }
                     }
                 })
@@ -181,10 +191,11 @@
                     if ($(this).html() == '&nbsp;' && turn == 'Player 1') {
                         $(this).text(player0_letter)
                         if (check_win(player0_letter)) {
-                            $('#stat').text('Player 1 WIN')
+                            $('#stat').text('Player 1 WIN!')
                             $('.cell').css('background-color', '#aaa')
                             $('#fuck').slideDown(1000)
                             $('.cell').prop('disabled', true)
+                            $('#player0_score').text(eval(+$('#player0_score').text()+1))
                         } else {
                             check_tie()
                             change_turn(player_list)
@@ -193,10 +204,11 @@
                     } else if ($(this).html() == '&nbsp;' && turn == 'Player 2') {
                         $(this).text(player1_letter)
                         if (check_win(player1_letter)) {
-                            $('#stat').text('Player 2 WIN')
+                            $('#stat').text('Player 2 WIN!')
                             $('.cell').css('background-color', '#aaa')
                             $('#fuck').slideDown(1000)
                             $('.cell').prop('disabled', true)
+                            $('#player1_score').text(eval(+$('#player1_score').text()+1))
                         } else {
                             check_tie()
                             change_turn(player_list)
@@ -214,6 +226,8 @@
             $('#fuck').css('display', 'none')
             reset_board()
             $('#stat').text('Game board')
+            $('#player0_score').text(0)
+            $('#player1_score').text(0)
 
         })
         $('#again').click(function () {
@@ -229,6 +243,7 @@
                 }, 1000)
             }
         })
+        
     })
 
 </script>
@@ -288,6 +303,10 @@
     .glyphicon{
         font-size: 25px;
     }
+    .x-x{
+        margin: 10px 10px;
+        font-size: 15px;
+    }
 </style>
 
 
@@ -313,15 +332,15 @@
 </div>
 
 <div class="custom-div" id='second' style="display: none">
-    <h1 style="margin-top: 0; padding: 40px 10px;">What do u perfer</h1>
-    <button class="button-noborder letter" style="margin: 20px; padding: 10px 20px">X</button>
-    <button class="button-noborder letter" style="margin: 20px; padding: 10px 20px">O</button>
+    <h1 style="margin-top: 0; padding: 40px 10px;">What do u prefer?</h1>
+    <button class="button-noborder letter" style="margin: 20px; padding: 10px 20px; font-size: 40px">X</button>
+    <button class="button-noborder letter" style="margin: 20px; padding: 10px 20px; font-size: 40px">O</button>
     <br>
     <button id='back' class="button-noborder" style="margin-top: 30px;"><span class="glyphicon glyphicon-arrow-left"></span> Back</button>
 </div>
 
 <div class="custom-div" id="third" style="display: none;">
-    <p id='stat' style="font-size: 30px">Game board</p>
+    <p class="x-x" style="float: left" id='player0_score'>0</p><p id='stat' style="font-size: 30px; display: inline">Game board</p><p style="float: right" class="x-x" id='player1_score'>0</p><br>
     <button id='1' class='cell'>&nbsp;</button>
     <button id='2' class='cell'>&nbsp;</button>
     <button id='3' class='cell'>&nbsp;</button>
