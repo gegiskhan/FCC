@@ -169,7 +169,7 @@
                             setTimeout(function () {
                                 ai_move(player1_letter)
                                 if (check_win(player1_letter)) {
-                                    $('#stat').text('Computer WIN!')
+                                    $('#stat').text('Computer WINS!')
                                     $('.cell').css('background-color', '#D1D5D8')
                                     $('#fuck').slideDown(1000)
                                     $('.cell').prop('disabled', true)
@@ -191,7 +191,7 @@
                     if ($(this).html() == '&nbsp;' && turn == 'Player 1') {
                         $(this).text(player0_letter)
                         if (check_win(player0_letter)) {
-                            $('#stat').text('Player 1 WIN!')
+                            $('#stat').text('Player 1 WINS!')
                             $('.cell').css('background-color', '#aaa')
                             $('#fuck').slideDown(1000)
                             $('.cell').prop('disabled', true)
@@ -204,7 +204,7 @@
                     } else if ($(this).html() == '&nbsp;' && turn == 'Player 2') {
                         $(this).text(player1_letter)
                         if (check_win(player1_letter)) {
-                            $('#stat').text('Player 2 WIN!')
+                            $('#stat').text('Player 2 WINS!')
                             $('.cell').css('background-color', '#aaa')
                             $('#fuck').slideDown(1000)
                             $('.cell').prop('disabled', true)
