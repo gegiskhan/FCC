@@ -1,0 +1,241 @@
+<meta charset="utf-8">
+<script src="https://ajax.aspnetcdn.com/ajax/jQuery/jquery-3.2.1.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<script>
+    moves_record = []
+    true_click = 0
+    increase = 0
+    strict = 0
+    special_flag = 1 // to stop infinity loop
+    function random_moves() {
+        var arr = ['#red', '#green', '#blue', '#yellow']
+        var rand = Math.floor(Math.random() * 4)
+        return arr[rand]
+    }
+    function go(count_value) {
+        var i = 0
+        flag = 0
+        special_flag = 0
+        $('.child').css('cursor', 'auto')
+        fuck = setInterval(function () {
+            var x = random_moves()
+            moves_record.push(x)
+            i++
+            setTimeout(function () {
+                $(x).css('opacity', '1')
+                setTimeout(function () {
+                    $(x).css('opacity', '0.5')
+
+                }, 800)
+
+            }, 800)
+            if (i === count_value) {
+                clearInterval(fuck)
+                flag = 1
+                special_flag = 1
+                $('.child').css('cursor', 'pointer')
+                console.log('moves_record: ', moves_record)
+            }
+        }, 1600)
+    }
+    function reshow(){
+        var i = 0
+        flag = 0
+        $('.child').css('cursor', 'auto')
+        xxx = setInterval(function () {
+            
+            setTimeout(function () {
+                $(moves_record[i]).css('opacity', '1')
+                setTimeout(function () {
+                    $(moves_record[i]).css('opacity', '0.5')
+                    i++
+                    flag = 1
+                }, 500)
+
+            }, 500)
+            if (i === moves_record.length-1) {
+                clearInterval(xxx)
+                flag = 1
+                $('.child').css('cursor', 'pointer')
+                $('#display').text(moves_record.length)
+            }
+        }, 1000)
+    }
+    $(document).ready(function () {
+        $('.start').click(function () {
+            $('#display').text(1)
+            count = 1
+            moves_record = []
+            if (special_flag === 1){
+                go(count)
+            }
+            
+
+        })
+        $('.child').click(function () {
+            if (flag == 1) {
+                var this_position = this
+                //just click effect
+                $(this).css('opacity', '1')
+                setTimeout(function () {
+                    $(this_position).css('opacity', '0.5')
+                }, 500)
+                //functioinality here
+                if ('#' + $(this_position).attr('id') === moves_record[increase]) {
+                    true_click += 1
+                    increase += 1
+                    if (true_click === moves_record.length) {
+                        if (moves_record.length === 4) { // Win condition
+                            count = 'Win'
+                            moves_record =[]
+                            true_click = 0
+                            increase = 0
+                            $('#display').text(count)
+                        }
+                        else {
+                            true_click = 0
+                            increase = 0
+                            count++
+                            $('#display').text(count)
+                            go(count)
+                            moves_record=[]
+                        }
+                    }
+                }else {
+                    if (strict === 1 ){
+                        count = 1
+                        moves_record =[]
+                        true_click = 0
+                        increase = 0
+                        go(count)
+                        $('#display').text(count)
+                    }
+                    else {
+
+                        $('#display').text('!!')
+                        true_click = 0
+                        increase = 0
+                        reshow()
+                    }
+                }
+            }
+        })
+        $('.strict').click(function () {
+            if (strict === 0){
+                strict = 1
+                $(this).css('background-color','red')
+            }else { 
+                strict = 0
+                $(this).css('background-color','gray')
+            }
+        })
+
+    })
+
+</script>
+
+<style>
+    body {
+        background-color: #888;
+        
+    }
+
+    .dad {
+        margin: 40px auto;
+        border-radius: 50%;
+        border: 10px solid black;
+        width: 400px;
+        height: 400px;
+        display: flex;
+        overflow: hidden;
+        flex-wrap: wrap;
+        justify-content: center;
+        box-sizing: border-box;
+    }
+
+    .child {
+        width: 50%;
+        height: 50%;
+        border: 3px solid black;
+        box-sizing: border-box;
+        opacity: 0.5;
+        transition-duration: 100ms;
+    }
+
+    #red {
+        background-color: red;
+    }
+
+    #blue {
+        background-color: blue;
+    }
+
+    #yellow {
+        background-color: yellow;
+    }
+
+    #green {
+        background-color: green;
+    }
+
+    .float {
+        z-index: 2;
+        width: 200px;
+        height: 200px;
+        align-self: center;
+        background-color: whitesmoke;
+        position: absolute;
+        border: 5px solid black;
+        border-radius: 50%;
+        display: flex;
+        justify-content: space-around;
+        align-items: center;
+    }
+
+    #display {
+        width: 45px;
+        height: 30px;
+        background-color: #777;
+        color: white;
+        text-align: center;
+        font-size: 23px;
+        border-radius: 3px;
+        font-family: cursive;
+    }
+
+    .float-child {
+        display: flex;
+        align-items: center;
+        flex-direction: column;
+        
+    }
+
+    p {
+        margin: 0
+    }
+    button{
+        border-radius: 50%;
+    }
+</style>
+
+<div class="dad">
+    <div class="float">
+        <div class="float-child">
+            <div id="display">- -</div>
+            <p>Count</p>
+        </div>
+        <div class="float-child">
+            <button class="start" style="width: 10px; height: 15px; background-color: gray"></button>
+            <p>start</p>
+        </div>
+        <div class=" float-child">
+            <button class='strict' style="width: 10px; height: 15px; background-color: gray "></button>
+            <p>strict</p>
+        </div>
+    </div>
+    <div id='red' class="child"></div>
+    <div id='blue' class="child"></div>
+    <div id='green' class="child"></div>
+    <div id='yellow' class="child"></div>
+</div>
