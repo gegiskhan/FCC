@@ -18,18 +18,18 @@
     function play_sound(color) {
         if (color === '#red') {
             red.play()
-            console.log('red play')
+            //console.log('red play')
         }
         else if (color === '#blue') {
             blue.play()
-            console.log('blue play')
+            //console.log('blue play')
         }
         else if (color === '#green') {
             green.play()
-            console.log('green play')
+            //console.log('green play')
         } else {
             yellow.play()
-            console.log('yellow play')
+            //console.log('yellow play')
         }
     }
     function random_moves() {
@@ -60,7 +60,7 @@
                 flag = 1
                 special_flag = 1
                 $('.child').css('cursor', 'pointer')
-                console.log('moves_record: ', moves_record)
+                //console.log('moves_record: ', moves_record)
             }
         }, 1400)
     }
@@ -80,7 +80,7 @@
                     clearInterval(xxx)
                     flag = 1
                     $('.child').css('cursor', 'pointer')
-                    $('#display').text(moves_record.length)
+                    $('#display').text(count)
                 }
             }, 500)
 
@@ -119,7 +119,7 @@
                             true_click = 0
                             increase = 0
                             $('#display').text(count)
-                            $('#win').text('You WIN this game, Congratulations!')
+                            $('#win').html('You WIN this game, Congratulations!'+'<br>' +'Press start button to play again')
                             $('#win').fadeIn(1000)
                             flag = 0
                             $('.child').css('cursor', 'auto')
@@ -135,6 +135,8 @@
                         }
                     }
                 } else {
+                    $('#display').text('!!')
+                    failed.play()
                     if (strict === 1) {
                         count = 1
                         moves_record = []
@@ -144,8 +146,6 @@
                         $('#display').text(count)
                     }
                     else {
-                        $('#display').text('!!')
-                        failed.play()
                         true_click = 0
                         increase = 0
                         reshow()
@@ -185,7 +185,6 @@
         justify-content: center;
         box-sizing: border-box;
         box-shadow: 0px 10px 40px 20px;
-       
     }
 
     .child {
@@ -233,7 +232,7 @@
     #display {
         width: 60px;
         height: 40px;
-        background-color: #888;
+        background-color: #666;
         color: white;
         text-align: center;
         font-size: 22px;
@@ -270,17 +269,24 @@
         width: 20px;
         height: 20px;
     }
-    .notification{
+
+    .notification {
         margin: 20px auto;
         text-align: center;
         color: whitesmoke;
         height: 30px;
-        
-        
+    }
+    p a {
+        text-decoration: none;
+        color: white;
+        transition-duration: 1s;
+    }
+    p a:hover{
+        color: gray
     }
 </style>
 <div class='notification'>
-    <h3 id='win' style="display: none"></h3>
+    <h3 id='win'>Press start button to play<br>If u prefer hardcore, turn on strict</h3>
 </div>
 <div class="dad">
     <div class="float">
@@ -307,5 +313,5 @@
     <div id='yellow' class="child"></div>
 </div>
 <footer style="text-align: center; color: white">
-    <p>Made by Gegiskhan</p>
+    <p>Made by <a href='https://codepen.io/gegiskhan/'>Gegiskhan</a></p>
 </footer>
