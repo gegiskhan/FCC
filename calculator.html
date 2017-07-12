@@ -22,7 +22,6 @@
     function action(operator) {
         if (oper_flag == 1) {
             flag = 'replace'
-            oper = operator
             x.push($('#display').text())
             x.push(operator)
             $('#show').text(x.join(' ').replace(/\*/g, 'x').slice(-30))
@@ -187,6 +186,11 @@
         border-left: 4px solid #999;
         border-bottom: 4px solid #fff;
         border-right: 4px solid #fff;
+    }
+    @media screen and (max-width: 500px){
+        .container{
+            transform: scale(0.8)
+        }
     }
 </style>
 <div class="container text-center light">
