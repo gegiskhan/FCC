@@ -1,0 +1,203 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/15.6.1/react.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/15.6.1/react-dom.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/6.25.0/babel.min.js"></script>
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.5.2/animate.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react-bootstrap/0.31.1/react-bootstrap.min.js"></script>
+
+<script type="text/babel">
+// Initial set up = [create default recipes, set up localStorage, create global varibales]
+    let { Panel, Accordion, Button, ButtonToolbar, Modal, FormGroup, FormControl, ControlLabel } = ReactBootstrap;
+    let defaultItems = [
+        {name: 'banana', ingre: ['fuck','asdas','sugar'], instr: 'just do it'},
+       {name: 'apple', ingre: ['sugar', 'apple', 'melon'], instr: 'i dont know'}
+    ]
+    let glob_name = ''
+    let glob_ing = []
+    let glob_ins = ''
+    console.log(localStorage)
+    if (localStorage.length==0){
+        localStorage.setItem('local', JSON.stringify(defaultItems))
+    }
+    let asd = JSON.parse(localStorage.local)
+    console.log(asd)
+// Main class here
+    class Main extends React.Component {
+        constructor(){
+            super()
+            this.state = {
+                theList: (localStorage.length==0 ? defaultItems : asd),
+                showModal: false,
+                showEdit: false
+            }
+            this.addNew = this.addNew.bind(this)
+            this.deleteItem = this.deleteItem.bind(this)
+        }
+        show(){
+            this.setState({showModal: true})
+        }
+        hide(){
+            this.setState({showModal: false})
+        }
+        showEdit(event){
+            this.setState({showEdit: true})
+            let itemList = this.state.theList.slice()
+            let x = event.target.parentNode.firstChild.textContent
+            glob_name = x
+            for (let i = 0; i<itemList.length; i++){
+                if (itemList[i].name == x){
+                    glob_ing = itemList[i].ingre
+                    glob_ins = itemList[i].instr
+                }
+            }
+            console.log(glob_ing, glob_ins)
+        }
+        hideEdit(){
+            this.setState({showEdit: false})
+        }
+        addNew(event){
+            const name = document.querySelector('#name').value
+            const ingre = document.querySelector('#ingre').value.split(',')
+            //console.log(ingre)
+            const instr = document.querySelector('#instr').value
+            const newItem = {name: name, ingre: ingre, instr: instr}
+            let newList = this.state.theList
+            newList.unshift(newItem)
+            localStorage.setItem('local', JSON.stringify(newList))
+            console.log(localStorage)
+            this.setState({theList: newList})
+        }
+        
+        deleteItem(event){
+            const text = event.target.parentNode.firstChild.textContent
+            console.log(text)
+            let currentList = this.state.theList
+            let newList = []
+            for (let i in currentList){
+                if (currentList[i].name !== text){
+                    newList.push(currentList[i])
+                }
+            }
+            this.setState({theList: newList})
+        }
+        saveEdit(obj){
+            let currentList = this.state.theList
+            for (let i in currentList){
+                if(currentList[i].name == glob_name){
+                    currentList.splice(i, 1)
+                    break
+                }
+            }
+            currentList.unshift(obj)
+            //console.log('the list now: ', currentList)
+            this.setState({theList: currentList})
+        }
+
+        render(){
+            
+            //console.log(this.state.theList)
+            const x = this.state.theList.map((item, i) => {
+                return (
+                    <Accordion key={i}>
+                        <Panel header={item.name} eventKey={i}>
+                            <p style={{display: 'none'}}>{item.name}</p>
+                            <h3>Ingredients</h3>
+                            <ol>
+                                {item.ingre.map((ele, i)=>{return <li key={i}>{ele}</li>})}
+                            </ol>
+                            <h3>Instruction</h3>
+                            <h4>{item.instr}</h4>
+                            <button onClick={this.deleteItem} className='btn btn-danger'>Delete</button>
+                            <button onClick={this.showEdit.bind(this)}>Edit</button>
+                        </Panel>
+                    </Accordion>
+                )
+            })
+            return (
+                <div>
+                    <h1>Items list</h1>
+                    {x}
+                    <button onClick={this.show.bind(this)} >Add recipe</button>
+                    <AddItem status={this.state.showModal} hideModal={this.hide.bind(this)} add={this.addNew}/>
+                    <EditItem status={this.state.showEdit} hide={this.hideEdit.bind(this)} edit={this.saveEdit.bind(this)}
+                    />
+                    
+                </div>
+
+            )
+        }
+    }
+// This for adding new recipe via a pop up window called Modal
+    class AddItem extends React.Component {
+        close(){
+            this.props.hideModal()
+        }
+        add(){
+            this.props.add()
+            this.props.hideModal()
+        }
+        render(){
+            return (
+                <Modal show={this.props.status} onHide={this.close.bind(this)}>
+                    <Modal.Header closeButton>
+                        <Modal.Title>Add new recipe</Modal.Title>
+                    </Modal.Header>
+                    <Modal.Body>
+                        <h2>Name</h2>
+                        <textarea id='name'/>
+                        <h2>Ingredients</h2>
+                        <textarea id='ingre'/>
+                        <h2>Instruction</h2>
+                        <textarea id='instr'/>
+                    </Modal.Body>
+                    <Modal.Footer>
+                        <Button onClick={this.add.bind(this)}>Add</Button>
+                        <Button onClick={this.close.bind(this)}>Close</Button>
+                    </Modal.Footer>
+                </Modal>
+            )
+        }
+    }
+    class EditItem extends React.Component{
+        save(){
+           let name = document.querySelector('#change-name').value
+           let ingre = document.querySelector('#change-ingre').value.split(',')
+           let instr = document.querySelector('#change-instr').value
+           let edited = {name: name, ingre: ingre, instr: instr}
+           console.log('edited', edited)
+           this.props.edit(edited)
+           this.props.hide()
+           
+       }
+        render(){
+            return (
+                <Modal show={this.props.status} onHide={this.props.hide}>
+                    <Modal.Header closeButton>
+                        <Modal.Title>Edit recipe</Modal.Title>
+                    </Modal.Header>
+                    <Modal.Body>
+                        <h2>Name</h2>
+                        <textarea id='change-name' defaultValue={glob_name}/>
+                        <h2>Ingredients</h2>
+                        <textarea id='change-ingre' defaultValue={glob_ing}/>
+                        <h2>Instruction</h2>
+                        <textarea id='change-instr' defaultValue={glob_ins}/>
+                    </Modal.Body>
+                    <Modal.Footer>
+                        <button onClick={this.save.bind(this)}>Save</button>
+                        <button onClick={this.props.hide}>Cancel</button>
+                    </Modal.Footer>
+                </Modal>
+            )
+        }
+    }
+
+    ReactDOM.render(<Main/>, document.querySelector('#app'))
+</script>
+
+<style>
+  
+</style>
+<div id="app" class="container"></div>
