@@ -17,20 +17,22 @@
     let glob_name = ''
     let glob_ing = []
     let glob_ins = ''
-    console.log(localStorage)
+    //console.log(localStorage)
     if (localStorage.length==0){
         localStorage.setItem('local', JSON.stringify(defaultItems))
     }
-    let asd = JSON.parse(localStorage.local)
-    console.log(asd)
+    let local = JSON.parse(localStorage.local)
+    console.log(local)
+    function updateStorage(newValue){
+        localStorage.setItem('local', JSON.stringify(newValue))
+    }
 // Main class here
     class Main extends React.Component {
         constructor(){
             super()
             this.state = {
-                theList: (localStorage.length==0 ? defaultItems : asd),
+                theList: (localStorage.length==0 ? defaultItems : local),
                 showModal: false,
-                showEdit: false
             }
             this.addNew = this.addNew.bind(this)
             this.deleteItem = this.deleteItem.bind(this)
@@ -42,7 +44,7 @@
             this.setState({showModal: false})
         }
         showEdit(event){
-            this.setState({showEdit: true})
+            this.setState({showModal: true})
             let itemList = this.state.theList.slice()
             let x = event.target.parentNode.firstChild.textContent
             glob_name = x
@@ -52,21 +54,12 @@
                     glob_ins = itemList[i].instr
                 }
             }
-            console.log(glob_ing, glob_ins)
         }
-        hideEdit(){
-            this.setState({showEdit: false})
-        }
-        addNew(event){
-            const name = document.querySelector('#name').value
-            const ingre = document.querySelector('#ingre').value.split(',')
-            //console.log(ingre)
-            const instr = document.querySelector('#instr').value
-            const newItem = {name: name, ingre: ingre, instr: instr}
+        
+        addNew(obj){
             let newList = this.state.theList
-            newList.unshift(newItem)
-            localStorage.setItem('local', JSON.stringify(newList))
-            console.log(localStorage)
+            newList.unshift(obj)
+            updateStorage(newList)
             this.setState({theList: newList})
         }
         
@@ -81,6 +74,7 @@
                 }
             }
             this.setState({theList: newList})
+            updateStorage(newList)
         }
         saveEdit(obj){
             let currentList = this.state.theList
@@ -93,24 +87,25 @@
             currentList.unshift(obj)
             //console.log('the list now: ', currentList)
             this.setState({theList: currentList})
+            updateStorage(currentList)
         }
 
         render(){
             
-            //console.log(this.state.theList)
+            //the <p> element below is just for searching purpose
             const x = this.state.theList.map((item, i) => {
                 return (
                     <Accordion key={i}>
-                        <Panel header={item.name} eventKey={i}>
+                        <Panel style={{cursor: 'pointer'}} header={item.name} eventKey={i}>
                             <p style={{display: 'none'}}>{item.name}</p>
                             <h3>Ingredients</h3>
-                            <ol>
+                            <ol style={{background: 'whitesmoke'}}>
                                 {item.ingre.map((ele, i)=>{return <li key={i}>{ele}</li>})}
                             </ol>
                             <h3>Instruction</h3>
-                            <h4>{item.instr}</h4>
-                            <button onClick={this.deleteItem} className='btn btn-danger'>Delete</button>
-                            <button onClick={this.showEdit.bind(this)}>Edit</button>
+                            <h5 style={{background: 'whitesmoke'}}>{item.instr}</h5><br/>
+                            <Button onClick={this.deleteItem} className='btn btn-danger'>Delete</Button>
+                            <Button onClick={this.showEdit.bind(this)} className='btn btn-primary'>Edit</Button>
                         </Panel>
                     </Accordion>
                 )
@@ -120,74 +115,66 @@
                     <h1>Items list</h1>
                     {x}
                     <button onClick={this.show.bind(this)} >Add recipe</button>
-                    <AddItem status={this.state.showModal} hideModal={this.hide.bind(this)} add={this.addNew}/>
-                    <EditItem status={this.state.showEdit} hide={this.hideEdit.bind(this)} edit={this.saveEdit.bind(this)}
-                    />
-                    
+                    <PopUp status={this.state.showModal} hideModal={this.hide.bind(this)} add={this.addNew} edit={this.saveEdit.bind(this)}/>
                 </div>
 
             )
         }
     }
-// This for adding new recipe via a pop up window called Modal
-    class AddItem extends React.Component {
+// This for adding or editting recipe via a pop up window called Modal
+    class PopUp extends React.Component {
+        saveEdit(){
+            let name = document.querySelector('#name').value == ''? 'Nameless' :document.querySelector('#name').value
+            let ingre = document.querySelector('#ingre').value.split(',')
+            let instr = document.querySelector('#instr').value
+
+            let edited = {name: name, ingre: ingre, instr: instr}
+            this.props.edit(edited)
+            this.props.hideModal()
+        }
         close(){
             this.props.hideModal()
         }
         add(){
-            this.props.add()
+            let name = document.querySelector('#name').value == ''? 'Nameless' :document.querySelector('#name').value
+            let ingre = document.querySelector('#ingre').value.split(',')
+            let instr = document.querySelector('#instr').value
+
+            let theNew = {name: name, ingre: ingre, instr: instr}
+            this.props.add(theNew)
             this.props.hideModal()
         }
         render(){
+            let titleName = ''
+            let buttonName = ''
+            if (event.target.textContent == 'Add recipe'){//event here is the last button clicked
+                titleName = 'Add new recipe'
+                buttonName = <Button onClick={this.add.bind(this)}>Add</Button>
+                glob_name = ''
+                glob_ing = []
+                glob_ins = ''
+            }
+            else{
+                titleName = 'Edit recipe'
+                buttonName = <Button onClick={this.saveEdit.bind(this)}>Save</Button>
+            }
+            
             return (
                 <Modal show={this.props.status} onHide={this.close.bind(this)}>
                     <Modal.Header closeButton>
-                        <Modal.Title>Add new recipe</Modal.Title>
+                        <Modal.Title>{titleName}</Modal.Title>
                     </Modal.Header>
                     <Modal.Body>
                         <h2>Name</h2>
-                        <textarea id='name'/>
+                        <textarea id='name' defaultValue={glob_name}/>
                         <h2>Ingredients</h2>
-                        <textarea id='ingre'/>
+                        <textarea id='ingre' defaultValue={glob_ing}/>
                         <h2>Instruction</h2>
-                        <textarea id='instr'/>
+                        <textarea id='instr' defaultValue={glob_ins}/>
                     </Modal.Body>
                     <Modal.Footer>
-                        <Button onClick={this.add.bind(this)}>Add</Button>
+                        {buttonName}
                         <Button onClick={this.close.bind(this)}>Close</Button>
-                    </Modal.Footer>
-                </Modal>
-            )
-        }
-    }
-    class EditItem extends React.Component{
-        save(){
-           let name = document.querySelector('#change-name').value
-           let ingre = document.querySelector('#change-ingre').value.split(',')
-           let instr = document.querySelector('#change-instr').value
-           let edited = {name: name, ingre: ingre, instr: instr}
-           console.log('edited', edited)
-           this.props.edit(edited)
-           this.props.hide()
-           
-       }
-        render(){
-            return (
-                <Modal show={this.props.status} onHide={this.props.hide}>
-                    <Modal.Header closeButton>
-                        <Modal.Title>Edit recipe</Modal.Title>
-                    </Modal.Header>
-                    <Modal.Body>
-                        <h2>Name</h2>
-                        <textarea id='change-name' defaultValue={glob_name}/>
-                        <h2>Ingredients</h2>
-                        <textarea id='change-ingre' defaultValue={glob_ing}/>
-                        <h2>Instruction</h2>
-                        <textarea id='change-instr' defaultValue={glob_ins}/>
-                    </Modal.Body>
-                    <Modal.Footer>
-                        <button onClick={this.save.bind(this)}>Save</button>
-                        <button onClick={this.props.hide}>Cancel</button>
                     </Modal.Footer>
                 </Modal>
             )
