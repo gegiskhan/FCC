@@ -38,7 +38,7 @@
             }
             
         }
-        show(){
+        showAdd(){
             this.setState({showModal: true, event: 'add'})
         }
         hide(){
@@ -114,7 +114,7 @@
                 <div>
                     <h1 className='animated rotateInDownLeft' id='header'>The Recipe Book</h1>
                     {x}
-                    <Button id='add-item-btn' className='animated rollIn' onClick={this.show.bind(this)} >Add recipe</Button>
+                    <Button id='add-item-btn' className='animated rollIn' onClick={this.showAdd.bind(this)} >Add recipe</Button>
                     <PopUp event={this.state.event} status={this.state.showModal} hideModal={this.hide.bind(this)} add={this.handleAddNew.bind(this)} edit={this.handleEditRecipe.bind(this)}/>
                 </div>
 
