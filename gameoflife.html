@@ -162,7 +162,7 @@
             return (
                 <div>
                     <Controller run={this.runGame} stop={this.stopGame} clear={this.clearGame} gen={this.state.generation}/>
-                    <div className='grid' style={{width: cells[0].length*15, height: cells.length*15}}>
+                    <div className='grid animated zoomIn' style={{width: cells[0].length*15, height: cells.length*15}}>
                         {cells}
                     </div>
                     <Settings changeSpeed={this.changeSpeed} changeSize={this.changeSize}/>
@@ -180,7 +180,7 @@
     class Controller extends React.Component {
         render(){
             return (
-                <div>
+                <div className='animated fadeIn'>
                     <button onClick={this.props.run} >Run</button>
                     <button onClick={this.props.stop} >Pause</button>
                     <button onClick={this.props.clear} style={{marginRight: 20}} >Clear</button>
