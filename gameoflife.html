@@ -7,141 +7,209 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.5.2/animate.min.css">
 
 <script type="text/babel">
-    //main class ggoes here
-    class Main extends React.Component {
-        constructor(){
-            super()
-            this.state = {
-                grid: {row: 7, col: 10},
-            }
-        }
-        
-        render(){
-            let cols = Array(this.state.grid.col).fill(false)
-            let arr = Array(this.state.grid.row).fill(cols)
-            console.log(arr)
-            return (
-                <div>
-                    <Grid cells={arr}/>
-                    <Foot/>
-                </div>
-            )
-        }
+    function findNeighbors(arr, i, j) {
+        let numOfNeighbors = 0
+        let numOfCol = arr[i].length - 1
+        let numOfRow = arr.length - 1
+        // try to find 8 neighbors
+        if (arr[i][j+1 > numOfCol ? 0 : j+1]) {numOfNeighbors++}
+        if (arr[i][j-1 < 0 ? numOfCol : j-1]) {numOfNeighbors++}
+        if (arr[i+1 > numOfRow ? 0 : i+1][j]) {numOfNeighbors++}
+        if (arr[i-1 < 0 ? numOfRow : i-1][j]) {numOfNeighbors++}
+        if (arr[i+1 > numOfRow ? 0 : i+1][j+1 > numOfCol ? 0 : j+1]) {numOfNeighbors++}
+        if (arr[i-1 < 0 ? numOfRow : i-1][j-1 < 0 ? numOfCol : j-1]) {numOfNeighbors++}
+        if (arr[i+1 > numOfRow ? 0 : i+1][j-1 < 0 ? numOfCol : j-1]) {numOfNeighbors++}
+        if (arr[i-1 < 0 ? numOfRow : i-1][j+1 > numOfCol ? 0 : j+1]) {numOfNeighbors++}
+
+        return numOfNeighbors
     }
+    //main class ggoes here
     class Grid extends React.Component{
         constructor(props){
             super(props)
+            let arr = []
+            for (let i = 0; i < 30; i++ ){
+                arr.push([])
+                for (let j = 0; j < 50; j++){
+                    arr[i].push(false)
+                }
+            }
             this.state = {
-                cellStatus: this.props.cells
+                theArr: arr,
+                generation: 0,
+                speed: 100
             }
             this.handleClick = this.handleClick.bind(this)
+            this.runGame = this.runGame.bind(this)
+            this.stopGame = this.stopGame.bind(this)
+            this.clearGame = this.clearGame.bind(this)
+            this.changeSpeed = this.changeSpeed.bind(this)
+            this.changeSize = this.changeSize.bind(this)
         }
         handleClick(e){
-            let id = e.target.id
-            let newArr = this.state.cellStatus.slice()
-            console.log(id)
-            let i = id.slice(0, 1)
-            let j = id.slice(1)
-            console.log(i, j)
-            console.log(newArr[i])
-            newArr[i][j] = !newArr[i][j]
-            this.setState({cellStatus: newArr})
+            let currentAllStat = this.state.theArr.slice()
+            let id = e.target.id.split(',') // id is a string like '12,21'
+            //console.log(id)
+            let row = id[0]
+            let col = id[1]
+            currentAllStat[row][col] = !currentAllStat[row][col]
+            this.setState({theArr: currentAllStat})
         }
-        run(){
-            let currentAllStat = this.state.cellStatus
-            let newAllStat = []
-            for (let i in currentAllStat){
-                for (let j in currentAllStat[i]) {
-                    let numOfNeighbors = 0
-                    //console.log(currentAllStat[i][j])
-                    if (currentAllStat[i][j + 1]) {numOfNeighbors++}
-                    if (currentAllStat[i][j-1]) {numOfNeighbors++}
-                    if (currentAllStat[i-1 < 0 ? i = currentAllStat.length -1: i-=1][j]) {numOfNeighbors++}
-                    if (currentAllStat[i+1][j]) {numOfNeighbors++}
-                    if (currentAllStat[i+1][j+1]) {numOfNeighbors++}
-                    if (currentAllStat[i+1][j-1]) {numOfNeighbors++}
-                    if (currentAllStat[i-1][j-1]) {numOfNeighbors++}
-                    if (currentAllStat[i-1][j+1]) {numOfNeighbors++}
+        runGame(){
+            clearInterval(this.loop)//this is to prevent many intervals at once
+            //console.log('runningg now')
+            this.loop = setInterval(function(){
+                let currentAllStat = this.state.theArr.slice()
+                let generation = this.state.generation
+                let newAllStat = []
+                for (let i = 0; i < currentAllStat.length; i++){
+                    newAllStat.push([])
+                    for (let j = 0; j < currentAllStat[i].length; j++) {
+                        //console.log(i, j)
+                        const numOfNeighbors = findNeighbors(currentAllStat, i, j)
 
-                    if (currentAllStat[i][j] == false && numOfNeighbors == 3) {
-                    newAllStat.push(true)
-                    }else if (newAllStat[i] == true && numOfNeighbors == 3){
-                        newAllStat.push(true)
-                    } else if (newAllStat[i] == true && numOfNeighbors == 2){
-                        newAllStat.push(true)
-                    }else {
-                        newAllStat.push(false)
+                        if (currentAllStat[i][j] == false && numOfNeighbors == 3) {
+                        newAllStat[i].push(true)
+                        }else if (currentAllStat[i][j] == true && numOfNeighbors == 3){
+                            newAllStat[i].push(true)
+                        }else if (currentAllStat[i][j] == true && numOfNeighbors == 2){
+                            newAllStat[i].push(true)
+                        }else {
+                            newAllStat[i].push(false)
+                        }
+                    }
+                }
+                generation++
+                this.setState({theArr: newAllStat, generation: generation})
+            }.bind(this), this.state.speed)
+            
+        }
+        stopGame(){
+            clearInterval(this.loop)
+        }
+        clearGame(){
+            clearInterval(this.loop)
+            let reset=[]
+            for (let i=0; i<this.state.theArr.length; i++ ){
+                reset.push([])
+                for (let j =0; j<this.state.theArr[0].length; j++){
+                    reset[i].push(false)
+                }
+            }
+            this.setState({theArr: reset, generation: 0, speed: 100})
+        }
+        changeSpeed(e){
+            this.stopGame()
+            if (e.target.textContent == 'Fast'){
+                this.setState({speed: 200})
+                e.target.textContent = 'Slow'
+            }
+            else {
+                this.setState({speed: 100})
+                e.target.textContent = 'Fast'
+            }
+            // setTimeout(function() {
+            //     this.runGame()
+            // }.bind(this), 0);
+        }
+        changeSize(e){
+            this.stopGame()
+            let newArr = []
+            if (e.target.textContent == '30x50'){
+                for (let i = 0; i < 30; i++ ){
+                newArr.push([])
+                    for (let j = 0; j < 30; j++){
+                        newArr[i].push(false)
+                    }
+                }
+                e.target.textContent = '30x30'
+                
+            }
+            else{
+                for (let i = 0; i < 30; i++ ){
+                newArr.push([])
+                    for (let j = 0; j < 50; j++){
+                        newArr[i].push(false)
+                    }
+                }
+                e.target.textContent = '30x50'
+            }
+            this.setState({theArr: newArr, generation: 0})
+        }
+        componentDidMount(){
+            let currentAllStat = this.state.theArr.slice()
+
+            for (let i in currentAllStat){
+                for (let j in currentAllStat[i]){
+                    let randomNum = Math.random()
+                    if (randomNum > 0.5){
+                        currentAllStat[i][j] = true
                     }
                 }
             }
-            this.setState({cellStatus: newAllStat})
+            this.runGame()
+            //console.log(this.state.theArr)
+            //this.setState({theArr: currentAllStat})
         }
-      
         render(){
-            let arr = []
-            for (let i in this.props.cells){
-                arr.push([])
-                for (let j in this.props.cells[i]){
-                    arr[i].push(<Cell id={i+j} key={i+j} status={this.state.cellStatus[i][j]} onClick={this.handleClick}/>)
+            let cells = []
+            for (let i in this.state.theArr){
+                cells.push([])
+                for (let j in this.state.theArr[i]){
+                    cells[i].push(<Cell id={i+ ',' +j} key={i+j} status={this.state.theArr[i][j]} onClick={this.handleClick}/>)
                 }
             }
-            console.log(arr)
             return (
                 <div>
-                    <Head run={this.run.bind(this)}/>
-                    <div className='grid' style={{width: this.props.cells[0].length*20, height: this.props.cells.length*20}}>
-                        {arr}
+                    <Controller run={this.runGame} stop={this.stopGame} clear={this.clearGame} gen={this.state.generation}/>
+                    <div className='grid' style={{width: cells[0].length*15, height: cells.length*15}}>
+                        {cells}
                     </div>
+                    <Settings changeSpeed={this.changeSpeed} changeSize={this.changeSize}/>
                 </div>
             )
         }
     }
+    // this is a cell in grid
     class Cell extends React.Component{
-        constructor(props){
-            super(props)
-            this.changeColor = this.changeColor.bind(this)
-        }
-        changeColor(e){
-            let id = e.target.id
-            //console.log(id)
-            this.props.onClick(id)
-            
-        }
         render(){
-            return (
-                <button id={this.props.id} className={this.props.status ? 'cell-active':'cell'} onClick={this.props.onClick}></button>
-            )
+            return (<div id={this.props.id} className={this.props.status? 'cell-active':'cell'} onClick={this.props.onClick}></div>)
         }
     }
-    class Head extends React.Component {
+    // this is for:  stop, run, clear the grid
+    class Controller extends React.Component {
         render(){
             return (
                 <div>
-                    <button onClick={this.props.run} className='btn btn-primary'>Run</button>
-                    <button className='btn btn-primary'>Pause</button>
-                    <button className='btn btn-primary'>Clear</button>
-                    <span>Generations</span>
+                    <button onClick={this.props.run} >Run</button>
+                    <button onClick={this.props.stop} >Pause</button>
+                    <button onClick={this.props.clear} style={{marginRight: 20}} >Clear</button>
+                    <span>Generations: {this.props.gen}</span>
                 </div>
             )
         }
     }
-
-    class Foot extends React.Component {
+    //some settings abt speed and board size
+    class Settings extends React.Component{
         render(){
             return (
-                <p>some settings</p>
+            <div>
+                <span>Board size:</span><button id='small' onClick={this.props.changeSize}>30x50</button>
+                <span style={{marginLeft: 15}}>Sim speed:</span><button onClick={this.props.changeSpeed}>Fast</button>
+            </div>
             )
         }
     }
-    ReactDOM.render(<Main/>, document.querySelector('#app'))
+    ReactDOM.render(<Grid/>, document.querySelector('#app'))
     
 
 </script>
 
 <style>
     body{
-        background: slategray;
+        background: url(http://eskipaper.com/images/dark-background-pictures-1.jpg);
         color: whitesmoke;
+        font-size: 20px;
     }
     .container{
         margin-top: 40px;
@@ -150,26 +218,43 @@
         text-align: center;
     }
     .grid{
+        margin: 10px;
         display: flex;
         flex-wrap: wrap;
-        border: 5px solid green;
+        border: 5px solid #999;
         box-sizing: content-box;
         justify-content: flex-start;
+        border-radius: 10px;
+        box-shadow: 10px 15px 10px #111;
     }
    .cell{
-       width: 20px;
-       height: 20px;
-       background: #777;
+       width: 15px;
+       height: 15px;
+       background: #555;
        box-sizing: border-box;
-       border: 1px solid #bbb;
+       border: 0.5px solid #777;
    }
    .cell-active{
-       width: 20px;
-       height: 20px;
-       background: white;
+       width: 15px;
+       height: 15px;
+       background: #FDE3A7;
        box-sizing: border-box;
-       border: 1px solid #bbb;
+       border: 0.5px solid #777;
+       animation: background-change 300ms forwards;
    }
+   @keyframes background-change {
+       100%{background: #EC644B}
+   }
+   button{
+       background: #333;
+       color: white;
+       margin: 5px;
+       box-shadow: 5px 10px 10px #111;
+   }
+   button:hover{
+        background: #777;
+   }
+   
   
 </style>
 
