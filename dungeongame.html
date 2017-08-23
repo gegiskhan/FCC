@@ -1,0 +1,602 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/15.6.1/react.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/15.6.1/react-dom.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/6.25.0/babel.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.5.2/animate.min.css">
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react-bootstrap/0.31.1/react-bootstrap.min.js"></script>
+<link href="https://fonts.googleapis.com/css?family=Press+Start+2P|Happy+Monkey" rel="stylesheet">
+
+<script type="text/babel">
+    const MAP_WIDTH = 50 
+    const MAP_HEIGHT = 70
+
+    let {Modal, Button} = ReactBootstrap
+
+    let killSound = new Audio('https://www.soundjay.com/button/sounds/button-10.mp3')
+    let hitSound = new Audio('https://www.soundjay.com/button/sounds/button-23.mp3')
+    let pickSound = new Audio('https://www.soundjay.com/button/sounds/button-19.mp3')
+    let lvUpSound = new Audio('https://www.soundjay.com/misc/sounds/magic-chime-01.mp3')
+    let dieSound = new Audio('https://www.soundjay.com/misc/sounds/fail-buzzer-03.mp3')
+    let winSound = new Audio('https://www.soundjay.com/free-music/sounds/iron-man-01.mp3')
+
+    function createRoomUp(arr, x, y){
+        let roomSize = [Math.floor(Math.random()*4 + 3), Math.floor(Math.random()*4 + 3)]
+        if (x - 7 > 0 && y - 7> 0 && arr[x][y] !== 'floor' && arr[x - roomSize[0] ][ y  ] !== 'floor'){
+            for(var i = x; i >= -roomSize[0]+x; i--){ //go up
+                for(var j = y; j<= roomSize[1]+y; j++){ //go right
+                    arr[i][j]='floor'
+                }
+            }
+            arr[x+1][y+2]='floor' // creating corridor
+            generateMap(arr, x - roomSize[0], y)
+
+        }
+    }
+    function createRoomLeft(arr, x, y) {
+        let roomSize = [Math.floor(Math.random()*4 + 3), Math.floor(Math.random()*4 + 3)]
+        if (x-8>0 && y-8>0 && arr[x][y] !== 'floor' && arr[x][ y - roomSize[1]] !== 'floor'){
+            for(var i = x; i <= roomSize[0]+x; i++){ // go down
+                for(var j = y; j>= -roomSize[1]+y; j--){ // go left
+                    arr[i][j]='floor'
+                }
+            }
+            arr[x+2][y+1]='floor' // corridor
+            generateMap(arr, x, y - roomSize[1])
+
+        }
+        
+    }
+    function generateMap(arr, x, y){
+        createRoomLeft(arr, x-2, y-2)
+        createRoomUp(arr, x-2, y-1)
+    }
+    
+    function createPlayer(arr) {
+        while (true){
+            let randomRow = Math.floor(Math.random()*MAP_WIDTH)
+            let randomCol = Math.floor(Math.random()*MAP_HEIGHT)
+            if (arr[randomRow][randomCol] === 'floor'){
+                arr[randomRow][randomCol] = 'player'
+                return [randomRow, randomCol]
+            }
+        }
+
+    }
+    function createEnemy(arr, dungeon){ 
+        for (let i = 1; i < arr.length; i++){
+            for (let j = 1; j < arr[i].length; j++){
+                if (arr[i][j] === 'floor' && Math.random()<0.011){
+                    arr[i][j] = {type: 'enemy', health: Math.round(Math.random()*(10)+10*(1+dungeon/3)), dam: Math.random()*(8)+10*(1+dungeon/8), xp: 20}
+                }
+            }
+        }
+    }
+    
+    function createPotion(arr) {
+        for (let i = 1; i < arr.length; i++){
+            for (let j = 1; j < arr[i].length; j++){
+                if (arr[i][j] === 'floor' && Math.random()<0.01){
+                    arr[i][j] = {type: 'potion', health: Math.round(Math.random()*(30)+10)}
+                }
+            }
+        }
+    }
+    function createWeapon(arr, dungeon) {
+        let weapons = [
+            [
+                {type: 'weapon', name: 'Sword', class: 'sword',  dam: 2, },
+                {type: 'weapon', name: 'Axe',  dam: 3, class: 'axe',},
+                {type: 'weapon', name: 'Rusty knife',  dam: 1, class: 'rusty-knife',}
+            ],
+            [
+                {type: 'weapon', name: 'Sword', class: 'sword',  dam: 2, },
+                {type: 'weapon', name: 'Axe',  dam: 3, class: 'axe',},
+                {type: 'weapon', name: 'Rusty knife',  dam: 1, class: 'rusty-knife',}
+            ],
+            [
+                {type: 'weapon', name: 'Trident', class: 'trident',  dam: 4, },
+                {type: 'weapon', name: 'Axe',  dam: 3, class: 'axe',},
+                {type: 'weapon', name: 'Sword', class: 'sword',  dam: 2, }
+            ],
+            [
+                {type: 'weapon', name: 'Trident', class: 'trident',  dam: 4, },
+                {type: 'weapon', name: 'Axe',  dam: 3, class: 'axe',},
+                {type: 'weapon', name: 'Longsword',  dam: 5, class: 'long-sword',},
+
+            ],
+            [
+                {type: 'weapon', name: 'Trident', class: 'trident',  dam: 4, },
+                {type: 'weapon', name: 'Scythe',  dam: 6, class: 'scythe',},
+                {type: 'weapon', name: 'Longsword',  dam: 5, class: 'long-sword',},
+            ]
+
+
+        ]
+        for (let i = 1; i < arr.length; i++){
+            for (let j = 1; j < arr[i].length; j++){
+                let randomNum = Math.floor(Math.random()*weapons[dungeon].length)
+                if (arr[i][j] === 'floor' && Math.random()<0.004){
+                    arr[i][j] = weapons[dungeon][randomNum]
+                }
+            }
+        }
+    }
+    function createPortal(arr) {
+        while (true){
+            let randomRow = Math.floor(Math.random()*MAP_WIDTH)
+            let randomCol = Math.floor(Math.random()*MAP_HEIGHT)
+            if (arr[randomRow][randomCol] === 'floor'){
+                arr[randomRow][randomCol] = 'portal'
+                break
+            }
+        }
+
+    }
+    function createBoss(arr) {
+        while (true){
+            let randomRow = Math.floor(Math.random()*MAP_WIDTH)
+            let randomCol = Math.floor(Math.random()*MAP_HEIGHT)
+            if (arr[randomRow][randomCol] === 'floor'){
+                arr[randomRow][randomCol] = {type: 'boss', health: 200, dam: Math.random()*(30)+20, xp: 20}
+                break
+            }
+        }
+
+    }
+    class Grid extends React.Component{
+        constructor(){
+            super()
+            let arr = []
+            for (let i=0; i<MAP_WIDTH; i++){
+                arr.push([])
+                for (let j = 0; j<MAP_HEIGHT; j++){
+                    arr[i].push('wall')
+                }
+            }
+            let x = MAP_WIDTH-6
+            let y = MAP_HEIGHT-10
+            generateMap(arr, x, y)
+            let playerPosition = createPlayer(arr)
+            createEnemy(arr, 1)
+            createPotion(arr)
+            createWeapon(arr, 0)
+            createPortal(arr)
+            this.state = {
+                dungeon: 1,
+                map: arr,
+                x: playerPosition[0],
+                y: playerPosition[1],
+                viewRangeX: 5,
+                viewRangeY: 15, 
+                level: 1,
+                health: 100,
+                damage: 5,
+                weapon: 'Fist',
+                weaponDam: 0,
+                xp: 0,
+                logs: '',
+                showModal: false
+            }
+            
+
+        }
+        keydownHandler = (e)=>{ //handle arrow keys pressing
+            let theMap = this.state.map
+            let row = this.state.x
+            let col = this.state.y
+            
+            if (e.keyCode == 39){
+                this.action(theMap, row, col, row, col+1)
+            }else if (e.keyCode == 37){
+                this.action(theMap, row, col, row, col-1)
+            }else if (e.keyCode == 40){
+                this.action(theMap, row, col, row+1, col)
+            }else if (e.keyCode == 38){
+                this.action(theMap, row, col, row-1, col)
+            }
+        }
+        action(theMap, row, col, newRow, newCol){
+            if (theMap[newRow][newCol] ==='floor'){ //just move
+                theMap[row][col] = 'floor'
+                theMap[newRow][newCol] = 'player'
+                this.setState({map: theMap,x: newRow, y: newCol})
+            }
+            else if (theMap[newRow][newCol].type ==='enemy' || theMap[newRow][newCol].type ==='boss'){ // meet enemy
+                let enemy = theMap[newRow][newCol]
+                let health = this.state.health
+                enemy.health -= (this.state.damage + this.state.weaponDam)
+                health -= enemy.dam
+                
+                if (health <= 0){ // player dies
+                        this.die()
+                    }
+                else if (enemy.health <= 0){ //enemy dies, change position of player to enemy
+                    let xpGain = this.state.xp + enemy.xp
+                    if (xpGain == 100){
+                        this.levelUp()
+                        this.makeLog('Level up')
+                        xpGain = 0
+                    }
+                    theMap[row][col] = 'floor'
+                    theMap[newRow][newCol] = 'player'
+                    killSound.play()
+                    if (enemy.type === 'enemy'){
+                        this.setState({map: theMap,x: newRow, y: newCol, xp: xpGain, health: Math.round(health)})
+                    }else { // boss dies
+                        this.setState({showModal: true, map: theMap,x: newRow, y: newCol})
+                        winSound.play()
+                    }
+                }
+                else{
+                     // if not die, reduce player health, player position not change
+                    hitSound.play()
+                    console.log(enemy.health)
+                    this.setState({map: theMap, health: Math.round(health)})
+                }
+            }
+            else if (theMap[newRow][newCol].type ==='potion' ){ //eat potion
+                pickSound.play()
+                let health = this.state.health
+                let thePotion = theMap[newRow][newCol]
+                theMap[row][col] = 'floor'
+                theMap[newRow][newCol] = 'player'
+                this.makeLog('U picked a potion of '+ thePotion.health + ' HP')
+                this.setState({map: theMap, x: newRow, y: newCol, health: health + thePotion.health})
+            }
+            else if (theMap[newRow][newCol].type ==='weapon'){ // eat weapon
+                pickSound.play()
+                let weapon = theMap[newRow][newCol]
+                let weaponDam = this.state.weaponDam
+                theMap[row][col] = 'floor'
+                theMap[newRow][newCol] = 'player'
+                this.makeLog('U picked ' + weapon.name )
+                this.setState({map: theMap, x: newRow, y: newCol, weapon: weapon.name, weaponDam: weapon.dam })
+                
+            }
+            else if (theMap[newRow][newCol] === 'portal'){ // go to next dungeon
+                this.changeFloor(this.state.dungeon)
+            }
+        }
+        changeFloor=(floor)=>{
+            document.removeEventListener('keydown', this.keydownHandler)
+            lvUpSound.play()
+            let newDungeon = floor+1
+            let newArr = []
+            for (let i=0; i<MAP_WIDTH; i++){
+                newArr.push([])
+                for (let j = 0; j<MAP_HEIGHT; j++){
+                    newArr[i].push('wall')
+                }
+            }
+            let x = MAP_WIDTH-6
+            let y = MAP_HEIGHT-10
+
+            generateMap(newArr, x, y)
+            createEnemy(newArr, newDungeon)
+            createPotion(newArr)
+            createWeapon(newArr, newDungeon - 1)
+            if (newDungeon === 5){
+                createBoss(newArr)
+            }else {
+                createPortal(newArr)
+            }
+            let playerPosition = createPlayer(newArr)
+            setTimeout(function() {
+                this.setState({
+                    dungeon: newDungeon,
+                    map: newArr,
+                    x: playerPosition[0],
+                    y: playerPosition[1],
+                    logs: 'Welcom to dungeon ' + newDungeon
+                })
+                
+            }.bind(this), 1300);
+        }
+        levelUp=()=>{
+            lvUpSound.play()
+            let level = this.state.level + 1
+            let dam = Math.round(this.state.damage*1.2)
+            let health = Math.round(this.state.health + 20)
+            this.setState({level: level, damage: dam, health: health})
+        }
+        die=()=>{
+            document.removeEventListener('keydown', this.keydownHandler)
+            dieSound.play()
+            let newArr = []
+            for (let i=0; i<MAP_WIDTH; i++){
+                newArr.push([])
+                for (let j = 0; j<MAP_HEIGHT; j++){
+                    newArr[i].push('wall')
+                }
+            }
+            let x = MAP_WIDTH-6
+            let y = MAP_HEIGHT-10
+            generateMap(newArr, x, y)
+            createEnemy(newArr, this.state.dungeon)
+            createPotion(newArr)
+            createWeapon(newArr, this.state.dungeon - 1)
+            if (this.state.dungeon == 5){
+                createBoss(newArr)
+            }else {
+                createPortal(newArr)
+            }
+            let playerPosition = createPlayer(newArr)
+            setTimeout(function() {
+                
+                this.setState({
+                    map: newArr,
+                    x: playerPosition[0],
+                    y: playerPosition[1],
+                    health: 100,
+                    logs: 'U have died'
+                })
+            }.bind(this), 1000);
+            
+        }
+        makeLog = (text)=>{
+            this.setState({logs: text})
+        }
+        toggleDark=()=>{
+            if (this.state.viewRangeY == 15){
+                this.setState({viewRangeX: 5, viewRangeY: 5 })
+
+            }else {
+                this.setState({viewRangeX: 5, viewRangeY: 15 })
+            }
+        }
+        hideModal=()=>{
+            this.setState({showModal: false})
+        }
+        render(){
+            document.addEventListener('keydown', this.keydownHandler)
+
+            let x = this.state.x
+            let y = this.state.y
+            let rangeX = this.state.viewRangeX
+            let rangeY = this.state.viewRangeY
+            let startRow = x - rangeX < 0 ? 0 : x - rangeX
+            let startCol = y - rangeY < 0 ? 0 : y - rangeY
+            let endRow = x + rangeX > MAP_WIDTH-1 ? MAP_WIDTH-1 : x + rangeX
+            let endCol = y + rangeY > MAP_HEIGHT-1 ? MAP_HEIGHT-1 : y + rangeY
+            let cells = []
+            let row = -1
+            // below code is to stop change size of render when player reached edges
+            if (startRow <= 0){
+                endRow = rangeX*2
+            }else if (endRow >= MAP_WIDTH-1){
+                startRow = MAP_WIDTH-1- rangeX*2
+            }
+            if (startCol <=0){
+                endCol = rangeY*2
+            }else if ( endCol >= MAP_HEIGHT-1){
+                startCol = MAP_HEIGHT-1 - rangeY*2
+            }
+
+            // below block is to just render a part of map not entire map and keep updating according to player position
+            for(let i = startRow; i<= endRow; i++){
+                cells.push([])
+                row++
+                for(let j = startCol; j <= endCol; j++){
+                    //console.log('?: ', this.state.map[i][j])
+                   if (this.state.map[i][j] === 'floor'){
+                       cells[row].push(<Cell className='floor' key={i,j}/>)
+                   }else if (this.state.map[i][j] === 'player'){
+                        cells[row].push(<Cell className='player'  key={i,j}/>)
+                   }else if (this.state.map[i][j].type ==='enemy'){
+                        cells[row].push(<Cell className='enemy'  key={i,j}/>)
+                   }else if (this.state.map[i][j].type ==='potion'){
+                        cells[row].push(<Cell className='potion'  key={i,j}/>)
+                   }else if (this.state.map[i][j].type ==='weapon'){
+                        cells[row].push(<Cell className={this.state.map[i][j].class}  key={i,j}/>)
+                   }else if (this.state.map[i][j] === 'portal'){
+                       cells[row].push(<Cell className='portal'  key={i,j}/>)
+                   }else if (this.state.map[i][j].type === 'boss'){
+                       cells[row].push(<Cell className='boss' key={i, j}/>)
+                   }
+                   else{
+                       cells[row].push(<Cell className='wall' key={i,j}/>)
+                   }
+                }
+            }
+            return (
+                <div className='my-container'>
+                    <Infor infor={this.state}/>
+                    <div style={{width: 800, height: 'auto', display: 'flex', justifyContent: 'center', flexDirection: 'column', alignItems: 'center'}}>
+                        <span>DUNGEON {this.state.dungeon}</span>
+                        <div className='map animated flipInX' style={{width: cells[0].length*25, height: cells.length*25}}>
+                            {cells}
+                        </div>
+                    </div>
+                    <button className='my-button' onClick={this.toggleDark}>Toggle dark</button>
+                    <WinPopup status={this.state.showModal} hide={this.hideModal} />
+                </div>
+            )
+        }
+    }
+    class Cell extends React.Component{
+        render(){
+            return <div className={this.props.className}></div>
+        }
+    }
+    class Infor extends React.Component{
+        render(){
+            return (
+                <div className='infor animated zoomIn'>
+                    <br/>
+                    <h3>Player stats</h3>
+                    <p>Level: {this.props.infor.level}</p>
+                    <p>Damage: {this.props.infor.damage + this.props.infor.weaponDam}</p>
+                    <p>Weapon: <span style={{fontFamily: 'Happy Monkey'}}>{this.props.infor.weapon}</span></p>
+                    <p>Health: <span className={this.props.infor.health < 20 ? 'health-danger':'health'}>{this.props.infor.health}</span></p>
+                    <p>XP: <progress max='100' value={this.props.infor.xp}></progress></p>
+                    <p>Log: <span className='log'>{this.props.infor.logs}</span></p>
+                    
+
+                </div>
+            )
+        }
+    }
+    class WinPopup extends React.Component{
+        render(){
+            return (
+                <Modal show={this.props.status} onHide={this.props.hide} >
+                    
+                    <Modal.Body>
+                        <div style={{textAlign: 'center'}}>
+                            <h1>U have won! Incredible!</h1>
+                            <h3>Press ESC to continue</h3>
+                            <p>Designed by <a href='https://codepen.io/gegiskhan/'>Gegiskhan</a></p>
+                        </div>
+                        
+                    </Modal.Body>
+    
+                </Modal>
+            )
+        }
+    }
+    ReactDOM.render(<Grid/>, document.querySelector('#app'))
+</script>
+
+<style>
+    body{
+        background: url(https://s-media-cache-ak0.pinimg.com/originals/51/f6/85/51f685ee79399e42de3fc0f857178e53.jpg);
+        background-repeat: no-repeat;
+        background-size: cover;
+    }
+    .my-container{
+        display: flex;
+        align-items: flex-start;
+        justify-content: center;
+        background: rgba(0, 0, 0, 0.7);
+        color: white;
+        margin-top: 40px;
+        padding: 20px;
+        
+    }
+    .infor{
+        text-align: left;
+        font-size: 18px;
+        color: white;
+        margin-right: 20px;
+        width: 270px;
+        animation-delay: 1s;
+    }
+    .floor{
+        background: url(https://i.pinimg.com/736x/70/73/f3/7073f384db1145804d1fdf8b0f76a6ff--hand-painted-textures-tekstur.jpg);
+        background-size: 100%;
+        width: 25px;
+        height: 25px;
+    }
+    .player{
+        background: url(https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQnfENnV0ozlByR66XaUMs7QggrKI1R3YKO_WPeS3RpfvqzsIb4EQ);
+        background-size: 100%;
+        width: 25px;
+        height: 25px;
+    }
+    .enemy{
+        background: url(http://findicons.com/files/icons/2311/anime_smiley_icons/128/evil.png);
+        background-size: 100%;
+        width: 25px;
+        height: 25px;
+    }
+    .boss{
+        background: url(https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTIPoI9b9oKFUHh22ry2Qnhtt2lhatnMcElrB4dfyTBo1Ujtl1h);
+        background-size: 100%;
+        width: 25px;
+        height: 25px;
+    }
+    
+    .wall{
+        background: url(http://map.3dmodelfree.com/imguploads/Image/0911/zp/xz/3d/cz/0415/1.jpg);
+        width: 25px;
+        height: 25px;
+    }
+    .potion{
+        background: url(https://www.iconexperience.com/_img/v_collection_png/256x256/shadow/potion_blue.png);
+        background-size: 100%;
+        width: 25px;
+        height: 25px;
+    }
+    .sword{
+        background: url(http://www.freeiconspng.com/uploads/sword-icon-11.png);
+        background-size: 100%;
+        width: 25px;
+        height: 25px;
+    }
+    .axe{
+        background: url(https://www.iconexperience.com/_img/i_collection_png/256x256/plain/axe.png);
+        background-size: 100%;
+        width: 25px;
+        height: 25px;
+    }
+    .rusty-knife{
+        background: url(http://www.iconsplace.com/icons/preview/white/knife-256.png);
+        background-size: 100%;
+        width: 25px;
+        height: 25px;
+    }
+    .long-sword{
+        background: url(https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT3FPLQCjG9nfo-zo5C6-PbhDw-Ry4j6tsKQhR7eb1-2NN6Rgha);
+        background-size: 100%;
+        width: 25px;
+        height: 25px;
+    }
+    .trident{
+        background: url(http://game-icons.net/icons/lorc/originals/png/trident.png);
+        background-size: 100%;
+        width: 25px;
+        height: 25px;
+    }
+    .scythe{
+        background: url(http://www.iconsplace.com/download/white-scythe-128.ico);
+        background-size: 100%;
+        width: 25px;
+        height: 25px;
+    }
+    .map{
+        display: flex;
+        flex-wrap: wrap;
+        box-sizing: content-box;
+    }
+    .portal{
+        background: url(https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSHX-zHXzaqIYO4sai5GvIbHvVU27dw0IJNPAp3RQlMZEySshJH);
+        background-size: 100%;
+        width: 25px;
+        height: 25px;
+    }
+    span{
+        padding: 5px;
+    }
+    progress{
+        width: 150px;
+        height: 10px;
+    }
+    .log{
+        color: #999
+    }
+   .health-danger{
+       color: #D91E18;
+       animation-name: flash;
+       animation-duration: 1s;
+       animation-iteration-count: infinite;
+       animation-direction: alternate;
+   }
+   @keyframes flash{
+       100%{color: #F1A9A0}
+   }
+   .health{
+      color: #E9D460;
+   }
+   .my-button{
+       margin-left: 20px;
+       margin-top: 30px;
+       background: none;
+   }
+   .my-button:hover{
+       background: #777
+   }
+</style>
+<h1 style="font-family: 'Press Start 2P', cursive; text-align: center; font-size: 50px; margin-top: 40px; color: #847858" class="animated fadeInUp">Dungeon Game</h1>
+<div id="app"></div>
