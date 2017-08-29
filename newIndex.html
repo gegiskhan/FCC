@@ -22,8 +22,83 @@
         crossorigin="anonymous"></script>
     
     <script>
+
         $(document).ready(function() {
+            // create matrix rain
+            let c = document.querySelector('.blur-img')
+            let ctx = c.getContext('2d')
+
+            class Symbol {
+                constructor(x, y, speed){
+                    this.x = x
+                    this.y = y
+                    this.value = String.fromCharCode( 0x30A0 + Math.round(Math.random()*96))//get a random katakana char
+                    this.speed = speed
+                }
+                setToRandomSymbol(){
+                    if (Math.random()>0.95){
+                        this.value = String.fromCharCode( 0x30A0 + Math.round(Math.random()*96))
+                    }
+                }
+                render(){
+                    this.setToRandomSymbol()
+                    ctx.font = "bold 25px Calibri"
+                    ctx.fillStyle = '#27ae60'
+                    ctx.fillText(this.value, this.x, this.y)
+                    this.rain()
+                }
+                rain(){
+                    this.y > 700 ? this.y = 0 : this.y += this.speed
+                }
+            }
+
+            class Stream {
+                constructor(){
+                    this.symbols = []
+                    this.numOfSymbols = Math.floor(Math.random()*(20-5) + 5)
+                    this.speed = Math.floor(Math.random()*(10)+5)
+                }
+                generateSymbols(x, y){
+                    for( let i=0; i< this.numOfSymbols; i++){
+                        let symbol = new Symbol(x, y, this.speed)
+                        symbol.setToRandomSymbol()
+                        this.symbols.push(symbol)
+                        y -= 30
+                    }
+                }
+                render(){
+                    this.symbols.forEach(function(symbol){
+                        symbol.render()
+                    })
+                }
+            }
+            let x = 0
+            let y = - Math.floor(Math.random()*400)
+            let streams= []
+            for (let i = 0;  i< c.width; i++){
+                let stream = new Stream()
+                stream.generateSymbols(x, y)
+                streams.push(stream)
+                x += 30
+            }
+
+            function draw(){
+                let coverHeight = $('.cover').innerHeight()
+                let coverWidth = $('.cover').innerWidth()
+                $('canvas').attr('width', coverWidth)
+                $('canvas').attr('height', coverHeight)
+                ctx.fillStyle = 'black'
+                ctx.fillRect(0, 0, c.width, c.height)
+                streams.forEach(function(stream){
+                    stream.render()
+                })
+
+            }
+            setInterval(function(){
+                draw()
+            }, 50)
             
+
             // set background blur when clicking navbar-toggler button and vice versa
             $('.navbar-toggler').click(function(){
                 $('.content').toggleClass('blur')
@@ -49,9 +124,6 @@
         })
     </script>
     <style>
-        body{
-            background: #777;
-        }
         .navbar{
             position: absolute;
             z-index: 2;
@@ -81,13 +153,12 @@
             height: 100vh;
         }
         .blur-img{
-            background: url(https://cdn.finotto.org/uploads/2016/06/learn-to-code-cover-1100x734.jpg) fixed;
-            background-size: cover; 
-            filter: blur(5px);
-            width: 100%;
-            height: 100vh;
             z-index: 0;
             position: absolute;
+            animation: goBLur 10s forwards;
+        }
+        @keyframes goBLur {
+            100%{filter: blur(2px)}
         }
         .content{
             display: flex;
@@ -114,26 +185,19 @@
         }
         @keyframes flash{
         100%{opacity: 1}
-    }
-    #port{
-        margin-top: 70px;
-        color: white;
-    }
-    .col{
-        padding: 30px;
-    }
-    hr{
-        border: none;
-        width: 150px;
-        height: 3px;
-        background: black
-    }
+        }
+   
+        hr{
+            border: none;
+            width: 150px;
+            height: 3px;
+            background: black
+        }
     </style>
 </head>
 <body>
-    
     <div class="cover" id='top'>
-        <nav class="navbar navbar-expand-sm navbar-dark animated fadeInDown" style="opacity: 0; padding-left: 70px">
+        <nav class="navbar navbar-expand-sm navbar-dark animated fadeInDown" style="opacity: 0;">
             <a class="navbar-brand" href="#top" style="font-family: 'Pacifico', cursive; font-size: 30px;">Gegiskhan</a>
             <button class="navbar-toggler" type="button" data-toggle='collapse' data-target='.menu' aria-expanded="false">
                 <span class="navbar-toggler-icon"></span>
@@ -146,7 +210,8 @@
                </div>
             </div>
         </nav>
-        <nav id='nav' class="navbar navbar-expand-sm navbar-dark" style=" padding-left: 70px; display: none; position: fixed; background: rgba(0, 0, 0, 0.7)">
+
+        <nav id='nav' class="navbar navbar-expand-sm navbar-dark" style="display: none; position: fixed; background: rgba(0, 0, 0, 0.7)">
             <a class="navbar-brand" href="#top" style="font-family: 'Pacifico', cursive; font-size: 30px;">Gegiskhan</a>
             <button class="navbar-toggler" type="button" data-toggle='collapse' data-target='.menu' aria-expanded="false">
                 <span class="navbar-toggler-icon"></span>
@@ -159,8 +224,10 @@
                </div>
             </div>
         </nav>
-        <div class="blur-img"></div>
-        <div class="content animated zoomIn" style="animation-delay: 0.5s; text-align: center; animation-duration: 2s">
+
+        <canvas class="blur-img"></canvas>
+
+        <div class="content animated zoomIn" style="animation-delay: 5s; text-align: center; animation-duration: 2s">
             <h4>Hello, I'm Gegiskhan</h4>
             <h1>A SELF-TAUGHT WEB DEVELOPER</h1>
             <p>from Freecodecamp</p>
@@ -169,7 +236,7 @@
 
     </div>
 
-    <div id="skill" class="text-center" style="background: #eee; padding: 50px">
+    <div id="skill" class="text-center" style="background: #eee; padding: 50px; width: 100%">
         <h2 style="margin-top: 70px">MY SKILLS</h2>
         <hr>
         <h4>Here are my current skills, mostly learned from Freecodecamp</h4>
@@ -198,18 +265,7 @@
         </div>
     </div>
 
-    <div id="port" class="text-center">
-        <h2>PORTFOLIO</h2>
-        <h3>Bellow are my recent projects</h3>
-        <div class="row">
-            <div class="col">
-            </div>
-           
-            
-            
-           
-        </div>
-    </div>
+
 
 
 
