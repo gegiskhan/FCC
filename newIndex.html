@@ -25,9 +25,8 @@
 
         $(document).ready(function() {
             // create matrix rain
-            let c = document.querySelector('.blur-img')
+            let c = document.querySelector('canvas')
             let ctx = c.getContext('2d')
-
             class Symbol {
                 constructor(x, y, speed){
                     this.x = x
@@ -75,7 +74,7 @@
             let x = 0
             let y = - Math.floor(Math.random()*400)
             let streams= []
-            for (let i = 0;  i< c.width; i++){
+            for (let i = 0;  i< 46; i++){
                 let stream = new Stream()
                 stream.generateSymbols(x, y)
                 streams.push(stream)
@@ -103,14 +102,7 @@
             $('.navbar-toggler').click(function(){
                 $('.content').toggleClass('blur')
             })
-            // fixed navbar shows up/close 
-            $(window).scroll(function(){
-                if ($(this).scrollTop() > $('.cover').innerHeight() - 10){
-                    $('#nav').slideDown('slow')
-                }else{
-                    $('#nav').slideUp('fast')
-                }
-            })
+            
             // create smooth scroll on click
             $('a').click(function(event){
                 if (this.hash !== ''){
@@ -121,6 +113,42 @@
                     }, 800 )
                 }
             })
+            // create random animation on scroll
+            let $animation_element = $('.will-animate')
+            let $window = $(window)
+
+            function checkInView(){
+                let windowHeight = $window.height()
+                let windowTop = $window.scrollTop()
+                let windowBot = windowTop + windowHeight
+                let arr = ['fadeIn', 'pulse', 'fadeInLeft', 'flipInX']
+                let theAnimation = arr[Math.floor(Math.random()*arr.length)]
+                // show up a fixed navbar
+                if (windowTop > $('.cover').innerHeight() - 10){
+                    $('#nav').slideDown('slow')
+                }else{
+                    $('#nav').slideUp('fast')
+                }
+
+                $.each($animation_element, function(){
+                    let $element = $(this)
+                    let elementHeight = $element.outerHeight()
+                    let elementTop = $element.offset().top 
+                    let elementBot = elementHeight + elementTop
+                    console.log('windowntop: ', windowTop)
+                    console.log(elementBot)
+                    console.log('windowBot: ', windowBot)
+                    console.log('elementTop: ', elementTop)
+                    if (elementBot > windowTop && elementTop < windowBot){
+                        $element.addClass('animated')
+                        $element.addClass(theAnimation)
+                    }else{
+                        $element.removeClass('animated')
+                        $element.removeClass(theAnimation)
+                    }
+                })
+            }
+            $window.on('scroll resize', checkInView)
         })
     </script>
     <style>
@@ -193,11 +221,14 @@
             height: 3px;
             background: black
         }
+        .will-animate{
+            animation-duration: 1.5s;
+        }
     </style>
 </head>
 <body>
     <div class="cover" id='top'>
-        <nav class="navbar navbar-expand-sm navbar-dark animated fadeInDown" style="opacity: 0;">
+        <nav class="navbar navbar-expand-sm navbar-dark animated fadeInDown" style="opacity: 0; animation-delay: 5s">
             <a class="navbar-brand" href="#top" style="font-family: 'Pacifico', cursive; font-size: 30px;">Gegiskhan</a>
             <button class="navbar-toggler" type="button" data-toggle='collapse' data-target='.menu' aria-expanded="false">
                 <span class="navbar-toggler-icon"></span>
@@ -236,11 +267,11 @@
 
     </div>
 
-    <div id="skill" class="text-center" style="background: #eee; padding: 50px; width: 100%">
+    <div id="skill" class="text-center" style="background: #eee; padding: 50px;">
         <h2 style="margin-top: 70px">MY SKILLS</h2>
         <hr>
         <h4>Here are my current skills, mostly learned from Freecodecamp</h4>
-        <div class="row" style="margin: 40px">
+        <div class="row will-animate" style="margin: 40px">
             <div class="col" >
                 <img src="http://icons.iconarchive.com/icons/graphics-vibe/developer/256/html-5-icon.png" alt="" width="110px">
             </div>
@@ -252,7 +283,7 @@
             </div>
         </div>
         
-        <div class="row" style="margin: 40px">
+        <div class="row will-animate" style="margin: 40px">
             <div class="col">
                 <img src="https://getbootstrap.com/apple-touch-icon.png" alt="" width="110px">
             </div>
@@ -265,6 +296,11 @@
         </div>
     </div>
 
+    <div id="port" class="text-center" style="background: #eee; padding: 50px;">
+        <h2 style="margin-top: 70px">MY PROJECTS</h2>
+        <hr>
+        <h4>Some recent projects of mine</h4>
+    </div>
 
 
 
