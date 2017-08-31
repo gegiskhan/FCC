@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 
@@ -133,13 +132,13 @@
         <div class="col-xs-6">
             <h2>Set Session</h2>
             <button id='sub' class='my-button'>-</button>
-            <h3 id='set_session' style="display: inline">0.1</h3>
+            <h3 id='set_session' style="display: inline">25</h3>
             <button id='plus' class='my-button'>+</button>
         </div>
         <div class="col-xs-6">
             <h2>Set Break</h2>
             <button id='sub_break' class='my-button'>-</button>
-            <h3 id='set_break' style="display: inline">0.1</h3>
+            <h3 id='set_break' style="display: inline">5</h3>
             <button id='plus_break' class='my-button'>+</button>
         </div>
 
@@ -148,165 +147,9 @@
     <button id='start'>
         <div id = 'child'></div>
         <h1 id='name'>Session</h1>
-        <h1 id='count'>0.1</h1>
+        <h1 id='count'>25</h1>
     </button>
 </div>
 <audio id='sound' preload="auto">
 <source src="E:/Freemusic/Final_Count.mp3" type="audio/mp3">
-=======
-<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
-
-<script>
-    flag = 1
-    function plus_sub(operator, set) {
-
-        xx = $(set).text()
-        xx = eval(xx + operator + 1)
-        if (xx<1) {xx=1}
-        $(set).text(xx)
-    }
-
-    $(document).ready(function () {
-        b = $('#count').text()
-        a = eval(b * 60)
-        min = Math.floor(eval(a / 60))
-        sec = eval(a % 60)
-        $('#start').click(function () {
-            if (flag == 1) {
-                x = setInterval(function () {
-
-                    if (sec == 0 && min == 0) {
-                        if ($('#name').text() == 'Session') {
-                            $('#name').text('Break')
-                            b = $('#set_break').text()
-                            a = eval(b * 60)
-                            min = Math.floor(eval(a / 60))
-                            sec = eval(a % 60)
-                            $('#child').attr('style', 'height: 300px')
-                            $('#child').attr('style', 'background-color: #9365B8')
-                        } else {
-                            $('#name').text('Session')
-                            b = $('#set_session').text()
-                            a = eval(b * 60)
-                            min = Math.floor(eval(a / 60))
-                            sec = eval(a % 60)
-                            $('#child').attr('style', 'height: 300px')
-                        }
-                    }
-                    else if (sec == 0) {
-                        min = min - 1
-                        sec = 59
-                    }
-                    else {
-                        sec = sec - 1
-                    }
-                    $('#child').slideUp(min * 60 * 1000 + sec * 1000)
-                    //display area
-                    if (sec < 10) { $('#count').text(min + ':' + '0' + sec) }
-                    if (min < 10) { $('#count').text('0' + min + ':' + sec) }
-                    if (sec < 10 && min < 10) { $('#count').text('0' + min + ':' + '0' + sec) }
-                    if (sec >= 10 && min >= 10) { $('#count').text(min + ':' + sec) }
-                }, 1000)
-                flag = 0
-
-            } else {
-                $('#child').stop(true)
-                clearInterval(x)
-                flag = 1
-            }
-        })
-
-        $('#plus').click(function () {
-            if (flag == 1) {
-                plus_sub('+', '#set_session')
-                if ($('#name').text() == 'Session') { $('#count').text(xx) }
-            } else if (flag == 0 && $('#name').text() == 'Break') { plus_sub('+', '#set_session') }
-        })
-
-        $('#sub').click(function () {
-            if (flag == 1) {
-                plus_sub('-', '#set_session')
-                if ($('#name').text() == 'Session') { $('#count').text(xx) }
-            } else if (flag == 0 && $('#name').text() == 'Break') { plus_sub('-', '#set_session') }
-        })
-        $('#sub_break').click(function () {
-            if (flag == 1) {
-                plus_sub('-', '#set_break')
-                if ($('#name').text() == 'Break') { $('#count').text(xx) }
-            } else if (flag == 0 && $('#name').text() == 'Session') { plus_sub('-', '#set_break') }
-        })
-        $('#plus_break').click(function () {
-            if (flag == 1) {
-                plus_sub('+', '#set_break')
-                if ($('#name').text() == 'Break') { $('#count').text(xx) }
-            } else if (flag == 0 && $('#name').text() == 'Session') { plus_sub('+', '#set_break') }
-        })
-    })
-
-</script>
-
-<style>
-    body {
-        background-color: #666;
-        color: white;
-    }
-
-    #start {
-        overflow: hidden;
-        position: relative;
-        width: 300px;
-        height: 300px;
-        border-radius: 50%;
-        color: white;
-        z-index: 1;
-        background-color: #666;
-        border: 5px solid white;
-    }
-
-    #child {
-        position: absolute;
-        background-color: #61BD6D;
-        width: 100%;
-        bottom: 0;
-        left: 0;
-        height: 300px;
-        z-index: -1;
-    }
-
-    .my-button {
-        background-color: #666;
-        padding: 10px;
-        border: none;
-        font-size: 23px;
-    }
-</style>
-
-<div class="container text-center">
-    <h1 style="font-size: 60px; font-family: fantasy">Pomodoro</h1>
-    <div class="row">
-        <div class="col-xs-6">
-            <h2>Set Session</h2>
-            <button id='sub' class='my-button'>-</button>
-            <h3 id='set_session' style="display: inline">0.1</h3>
-            <button id='plus' class='my-button'>+</button>
-        </div>
-        <div class="col-xs-6">
-            <h2>Set Break</h2>
-            <button id='sub_break' class='my-button'>-</button>
-            <h3 id='set_break' style="display: inline">0.1</h3>
-            <button id='plus_break' class='my-button'>+</button>
-        </div>
-
-    </div>
-    <br>
-    <button id='start'>
-        <div id = 'child'></div>
-        <h1 id='name'>Session</h1>
-        <h1 id='count'>0.1</h1>
-    </button>
-</div>
-<audio id='sound' preload="auto">
-<source src="E:/Freemusic/Final_Count.mp3" type="audio/mp3">
->>>>>>> f553760ec9948f3468140cf7e6adc647ec6d1998
 </audio>
