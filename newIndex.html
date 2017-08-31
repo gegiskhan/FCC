@@ -46,7 +46,7 @@
                     this.rain()
                 }
                 rain(){
-                    this.y > 700 ? this.y = 0 : this.y += this.speed
+                    this.y > 732 ? this.y = 0 : this.y += this.speed
                 }
             }
 
@@ -120,26 +120,22 @@
                 let windowHeight = $window.height()
                 let windowTop = $window.scrollTop()
                 let windowBot = windowTop + windowHeight
-                let arr = ['fadeIn', 'pulse', 'fadeInLeft', 'flipInX']
-                let theAnimation = arr[Math.floor(Math.random()*arr.length)]
                 // show up a fixed navbar
                 if (windowTop > $('.cover').innerHeight() - 10){
                     $('#nav').slideDown('slow')
                 }else{
                     $('#nav').slideUp('fast')
                 }
-
                 $.each($animation_element, function(){
                     let $element = $(this)
                     let elementHeight = $element.outerHeight()
                     let elementTop = $element.offset().top 
                     let elementBot = elementHeight + elementTop
-                    if (elementBot > windowTop && elementTop < windowBot){
-                        $element.addClass('animated')
-                        $element.addClass(theAnimation)
+                    if (elementBot >= windowTop && elementTop <= windowBot){
+                        $element.addClass('animated pulse')
                     }else{
-                        $element.removeClass('animated')
-                        $element.removeClass(theAnimation)
+                        $element.removeClass('animated pulse')
+                        
                     }
                 })
             }
@@ -147,6 +143,9 @@
         })
     </script>
     <style>
+        body{
+            position: relative;
+        }
         .navbar{
             position: absolute;
             z-index: 2;
@@ -171,6 +170,9 @@
         .nav-item:hover::after{
             width: 100%;
         }
+        .active::after{
+            width: 100%;
+        }
         .cover{
             width: 100%;
             height: 100vh;
@@ -181,6 +183,7 @@
             animation: goBLur 10s forwards;
         }
         @keyframes goBLur {
+            30%{filter: none}
             100%{filter: blur(2px)}
         }
         .content{
@@ -219,12 +222,52 @@
         .col{
             padding: 10px;
         }
+        .portfolio-img{
+            margin-bottom: 15px;
+            position: relative;
+        }
+        .portfolio-img:hover .overlay{
+            bottom: 0;
+            height: 100%;
+        }
         .will-animate{
             animation-duration: 1.5s;
         }
+        .overlay{
+            box-sizing: border-box;
+            position: absolute;
+            bottom: 100%;
+            left: 0;
+            right: 0;
+            background: rgba(0, 0, 0, 0.4);
+            overflow: hidden;
+            width: calc(100% - 30px);
+            margin: auto;
+            height: 0;
+            transition: 1s ease
+        }
+        .text {
+            white-space: nowrap; 
+            color: white;
+            font-size: 100%;
+            position: absolute;
+            overflow: hidden;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            -ms-transform: translate(-50%, -50%);
+        }
+        #port{
+            padding: 50px;
+        }
+        @media screen and (max-width: 500px){
+            #port{
+                padding: 0px;
+            }
+        }
     </style>
 </head>
-<body>
+<body data-spy='scroll' data-target='#nav' data-offset='0'>
     <div class="cover" id='top'>
         <nav class="navbar navbar-expand-sm navbar-dark animated fadeInDown" style="opacity: 0; animation-delay: 5s">
             <a class="navbar-brand" href="#top" style="font-family: 'Pacifico', cursive; font-size: 30px;">Gegiskhan</a>
@@ -268,8 +311,8 @@
     <div id="skill" class="text-center" style="background: #eee; padding: 50px;">
         <h2 style="margin-top: 70px">MY SKILLS</h2>
         <hr>
-        <h4>Here are my current skills, mostly learned from Freecodecamp</h4>
-        <div class="row will-animate" style="margin: 40px">
+        <h4>Here are my current skills, mostly learned from Freecodecamp, Codecademy, W3school, and Stackoverflow</h4>
+        <div class="row will-animate " style="margin: 40px">
             <div class="col" >
                 <img src="http://icons.iconarchive.com/icons/graphics-vibe/developer/256/html-5-icon.png" alt="" width="110px">
             </div>
@@ -281,7 +324,7 @@
             </div>
         </div>
         
-        <div class="row will-animate" style="margin: 40px">
+        <div class="row will-animate " style="margin: 40px">
             <div class="col">
                 <img src="https://getbootstrap.com/apple-touch-icon.png" alt="" width="110px">
             </div>
@@ -294,10 +337,122 @@
         </div>
     </div>
 
-    <div id="port" class="text-center" style="background: #ddd; padding: 50px;">
+    <div id="port" class="text-center" style="background: #ddd;">
         <h2 style="margin-top: 70px">MY PROJECTS</h2>
         <hr>
-        <h4>Some recent projects of mine</h4>
+        <h4>Recent projects</h4>
+        <div class="row" style="margin: 40px;">
+            <div class="col-md-4 col-sm-12 portfolio-img will-animate">
+                <img style="width: 100%" src="C:\Users\legen\Desktop\dungeon.png" alt="">
+                <div class="overlay">
+                    <div class="text">
+                        <h4>Dungeon game</h4>
+                        <p>an awesome game built with React</p>
+                        <br>
+                        <a style='color: #ccc;' href="">Try it</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 col-sm-12 portfolio-img will-animate">
+                <img style="width: 100%" src="C:\Users\legen\Desktop\gol.png" alt="">
+                <div class="overlay">
+                    <div class="text">
+                        <h4>Game of life</h4>
+                        <p>like life simulation?</p>
+                        <br>
+                        <a style='color: #ccc;' href="">Try it</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 col-sm-12 portfolio-img will-animate">
+                <img style="width: 100%" src="C:\Users\legen\Desktop\recipe.png" alt="">
+                <div class="overlay">
+                    <div class="text">
+                        <h4>Recipe box</h4>
+                        <p>do you like cooking?</p>
+                        <br>
+                        <a style='color: #ccc;' href="">Try it</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 col-sm-12 portfolio-img will-animate">
+                <img style="width: 100%" src="C:\Users\legen\Desktop\simon.png" alt="">
+                <div class="overlay">
+                    <div class="text">
+                        <h4>Simon game</h4>
+                        <p>an old school game built with jQuery</p>
+                        <br>
+                        <a style='color: #ccc;' href="">Try it</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 col-sm-12 portfolio-img will-animate">
+                <img style="width: 100%" src="C:\Users\legen\Desktop\toe.png" alt="">
+                <div class="overlay">
+                    <div class="text">
+                        <h4>Tic tac toe</h4>
+                        <p>everyone knows this game</p>
+                        <br>
+                        <a style='color: #ccc;' href="">Try it</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 col-sm-12 portfolio-img will-animate">
+                <img style="width: 100%" src="C:\Users\legen\Desktop\cal.png" alt="">
+                <div class="overlay">
+                    <div class="text">
+                        <h4>Calculator</h4>
+                        <p>built with jQuery</p>
+                        <br>
+                        <a style='color: #ccc;' href="">Try it</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 col-sm-12 portfolio-img will-animate">
+                <img style="width: 100%" src="C:\Users\legen\Desktop\pomodoro.png" alt="">
+                <div class="overlay">
+                    <div class="text">
+                        <h4>Pomodoro clock</h4>
+                        <p>an useful timer</p>
+                        <br>
+                        <a style='color: #ccc;' href="">Try it</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 col-sm-12 portfolio-img will-animate">
+                <img style="width: 100%" src="C:\Users\legen\Desktop\wiki.png" alt="">
+                <div class="overlay">
+                    <div class="text">
+                        <h4>Wikipedia searcher</h4>
+                        <p>good way to find something on wiki</p>
+                        <br>
+                        <a style='color: #ccc;' href="">Try it</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 col-sm-12 portfolio-img will-animate">
+                <img style="width: 100%" src="C:\Users\legen\Desktop\weather.png" alt="">
+                <div class="overlay">
+                    <div class="text">
+                        <h4>Weather app</h4>
+                        <p>use to forecast weather</p>
+                        <br>
+                        <a style='color: #ccc;' href="">Try it</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+      
+        <br>
+        <br>
+        <br>
+        <br>
+        <br>
+        <br>
+        <br>
+        <br>
+        <br>
+        <br>
     </div>
 
 
