@@ -39,11 +39,11 @@
                     }
                 }
                 render(){
-                    this.setToRandomSymbol()
                     ctx.font = "bold 25px Calibri"
                     ctx.fillStyle = '#27ae60'
                     ctx.fillText(this.value, this.x, this.y)
                     this.rain()
+                    this.setToRandomSymbol()
                 }
                 rain(){
                     this.y > 732 ? this.y = 0 : this.y += this.speed
@@ -53,7 +53,7 @@
             class Stream {
                 constructor(){
                     this.symbols = []
-                    this.numOfSymbols = Math.floor(Math.random()*(20-5) + 5)
+                    this.numOfSymbols = Math.floor(Math.random()*(12) + 5)
                     this.speed = Math.floor(Math.random()*(10)+5)
                 }
                 generateSymbols(x, y){
@@ -74,12 +74,13 @@
             let y = - Math.floor(Math.random()*400)
 
             let streams= []
-            for (let i = 0;  i< 46; i++){
+            for (let i = 0;  i< 45; i++){
                 let stream = new Stream()
                 stream.generateSymbols(x, y)
                 streams.push(stream)
                 x += 30
             }
+
             function draw(){
                 let coverHeight = $('.cover').innerHeight()
                 let coverWidth = $('.cover').innerWidth()
@@ -87,7 +88,8 @@
                 $('canvas').attr('height', coverHeight)
                 ctx.fillStyle = 'black'
                 ctx.fillRect(0, 0, c.width, c.height)
-                streams.forEach(function(stream){
+
+                streams.forEach(function (stream) {
                     stream.render()
                 })
 
@@ -329,7 +331,7 @@
                </div>
             </div>
         </nav>
-
+        <!-- fixed navbar  -->
         <nav id='nav' class="navbar navbar-expand-sm navbar-dark" style="display: none; position: fixed; background: rgba(0, 0, 0, 0.7)">
             <a class="navbar-brand" href="#top" style="font-family: 'Pacifico', cursive; font-size: 30px;">Gegiskhan</a>
             <button class="navbar-toggler" type="button" data-toggle='collapse' data-target='.menu' aria-expanded="false">
@@ -343,7 +345,7 @@
                </div>
             </div>
         </nav>
-
+        <!-- maxtrix show  -->
         <canvas class="blur-img"></canvas>
 
         <div class="content animated zoomIn" style="animation-delay: 5s; text-align: center; animation-duration: 2s">
@@ -354,11 +356,11 @@
         </div>
 
     </div>
-
+    <!-- skills part -->
     <div id="skill" class="text-center" style="background: #eee;">
         <h2 style="margin-top: 70px">MY SKILLS</h2>
         <hr>
-        <h4 class="info-text">Here are my current skills, mostly learned from Freecodecamp, Codecademy,<br> W3schools, and Stackoverflow</h4>
+        <h4 class="info-text">Here are my current skills, mostly learned from Freecodecamp, Codecademy, W3schools, and Stackoverflow</h4>
         <div class="row will-animate " style="margin: 40px">
             <div class="col" >
                 <img src="http://icons.iconarchive.com/icons/graphics-vibe/developer/256/html-5-icon.png" alt="" width="110px">
@@ -383,7 +385,7 @@
             </div>
         </div>
     </div>
-
+    <!-- portfolio part -->
     <div id="port" class="text-center" style="background: #ddd;">
         <h2 style="margin-top: 70px">MY PROJECTS</h2>
         <hr>
@@ -396,7 +398,7 @@
                         <h4>Dungeon game</h4>
                         <p>an awesome game built with React</p>
                         <br>
-                        <a style='color: #ccc;' href="https://gegiskhan.github.io/dungeongame.html" target="_blank">Try it</a>
+                        <a style='color: #ccc;' href="https://gegiskhan.github.io/dungeongame.html" target="_blank">TRY IT</a>
                     </div>
                 </div>
             </div>
@@ -407,7 +409,7 @@
                         <h4>Game of life</h4>
                         <p>like life simulation?</p>
                         <br>
-                        <a style='color: #ccc;' href="https://gegiskhan.github.io/gameoflife.html" target="_blank">Try it</a>
+                        <a style='color: #ccc;' href="https://gegiskhan.github.io/gameoflife.html" target="_blank">TRY IT</a>
                     </div>
                 </div>
             </div>
@@ -418,7 +420,7 @@
                         <h4>Recipe box</h4>
                         <p>do you like cooking?</p>
                         <br>
-                        <a style='color: #ccc;' href="https://codepen.io/gegiskhan/full/QMNBRR/" target="_blank">Try it</a>
+                        <a style='color: #ccc;' href="https://codepen.io/gegiskhan/full/QMNBRR/" target="_blank">TRY IT</a>
                     </div>
                 </div>
             </div>
@@ -429,7 +431,7 @@
                         <h4>Simon game</h4>
                         <p>an old school game built with jQuery</p>
                         <br>
-                        <a style='color: #ccc;' href="https://gegiskhan.github.io/simon.html" target="_blank">Try it</a>
+                        <a style='color: #ccc;' href="https://gegiskhan.github.io/simon.html" target="_blank">TRY IT</a>
                     </div>
                 </div>
             </div>
@@ -440,7 +442,7 @@
                         <h4>Tic tac toe</h4>
                         <p>everyone knows this game</p>
                         <br>
-                        <a style='color: #ccc;' href="https://gegiskhan.github.io/tictactoe.html" target="_blank">Try it</a>
+                        <a style='color: #ccc;' href="https://gegiskhan.github.io/tictactoe.html" target="_blank">TRY IT</a>
                     </div>
                 </div>
             </div>
@@ -451,7 +453,7 @@
                         <h4>Calculator</h4>
                         <p>built with jQuery</p>
                         <br>
-                        <a style='color: #ccc;' href="https://gegiskhan.github.io/calculator.html" target="_blank">Try it</a>
+                        <a style='color: #ccc;' href="https://gegiskhan.github.io/calculator.html" target="_blank">TRY IT</a>
                     </div>
                 </div>
             </div>
@@ -462,7 +464,7 @@
                         <h4>Pomodoro clock</h4>
                         <p>an useful timer</p>
                         <br>
-                        <a style='color: #ccc;' href="https://gegiskhan.github.io/Pomodoro.html" target="_blank">Try it</a>
+                        <a style='color: #ccc;' href="https://gegiskhan.github.io/Pomodoro.html" target="_blank">TRY IT</a>
                     </div>
                 </div>
             </div>
@@ -473,7 +475,7 @@
                         <h4>Wikipedia viewer</h4>
                         <p>good way to find something on wiki</p>
                         <br>
-                        <a style='color: #ccc;' href="https://codepen.io/gegiskhan/full/xrwjXd/" target="_blank">Try it</a>
+                        <a style='color: #ccc;' href="https://codepen.io/gegiskhan/full/xrwjXd/" target="_blank">TRY IT</a>
                     </div>
                 </div>
             </div>
@@ -484,7 +486,7 @@
                         <h4>Weather app</h4>
                         <p>use to forecast weather</p>
                         <br>
-                        <a style='color: #ccc;' href="https://gegiskhan.github.io/weather.html" target="_blank">Try it</a>
+                        <a style='color: #ccc;' href="https://gegiskhan.github.io/weather.html" target="_blank">TRY IT</a>
                     </div>
                 </div>
             </div>
@@ -492,7 +494,7 @@
         </div>
         
     </div>
-
+    <!-- contact part -->
     <div id="cont" class="text-center" style="background: #eee; padding: 50px">
             <h2 style="margin-top: 70px">CONTACT</h2>
             <hr>
