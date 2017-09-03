@@ -64,26 +64,50 @@
         $('#plus').click(function () {
             if (flag == 1) {
                 plus_sub('+', '#set_session')
-                if ($('#name').text() == 'Session') { $('#count').text(xx) }
+                if ($('#name').text() == 'Session') { 
+                    $('#count').text(xx)
+                    b = $('#set_session').text()
+                    a = eval(b * 60)
+                    min = Math.floor(eval(a / 60))
+                    sec = eval(a % 60)
+                }
             } else if (flag == 0 && $('#name').text() == 'Break') { plus_sub('+', '#set_session') }
         })
 
         $('#sub').click(function () {
             if (flag == 1) {
                 plus_sub('-', '#set_session')
-                if ($('#name').text() == 'Session') { $('#count').text(xx) }
+                if ($('#name').text() == 'Session') { 
+                    $('#count').text(xx)
+                    b = $('#set_session').text()
+                    a = eval(b * 60)
+                    min = Math.floor(eval(a / 60))
+                    sec = eval(a % 60)
+                }
             } else if (flag == 0 && $('#name').text() == 'Break') { plus_sub('-', '#set_session') }
         })
         $('#sub_break').click(function () {
             if (flag == 1) {
                 plus_sub('-', '#set_break')
-                if ($('#name').text() == 'Break') { $('#count').text(xx) }
+                if ($('#name').text() == 'Break') {
+                    $('#count').text(xx)
+                    b = $('#set_break').text()
+                    a = eval(b * 60)
+                    min = Math.floor(eval(a / 60))
+                    sec = eval(a % 60)
+                }
             } else if (flag == 0 && $('#name').text() == 'Session') { plus_sub('-', '#set_break') }
         })
         $('#plus_break').click(function () {
             if (flag == 1) {
                 plus_sub('+', '#set_break')
-                if ($('#name').text() == 'Break') { $('#count').text(xx) }
+                if ($('#name').text() == 'Break') {
+                    $('#count').text(xx)
+                    b = $('#set_break').text()
+                    a = eval(b * 60)
+                    min = Math.floor(eval(a / 60))
+                    sec = eval(a % 60)
+                }
             } else if (flag == 0 && $('#name').text() == 'Session') { plus_sub('+', '#set_break') }
         })
     })
