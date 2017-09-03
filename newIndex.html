@@ -95,9 +95,7 @@
                 })
 
             }
-            let maxtrixInterval = setInterval(function(){
-                draw()
-            }, 50)
+            let maxtrixInterval = setInterval(draw, 50)
             
 
             // set background blur when clicking navbar-toggler button and vice versa
@@ -133,9 +131,7 @@
                     $('#nav').slideUp('fast')
 
                     if (matrixStop === true ){
-                        maxtrixInterval = setInterval(function(){ // continue maxtrix invterval when in sight
-                            draw()
-                        }, 50)
+                        maxtrixInterval = setInterval( draw, 50)// continue maxtrix invterval when in sight
                         matrixStop = false
                     }
                 }
