@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    
+    <script src='https://cdnjs.cloudflare.com/ajax/libs/d3/4.9.1/d3.min.js'></script>
+    <script src="https://ajax.aspnetcdn.com/ajax/jQuery/jquery-3.2.1.min.js"></script>
+
+    <title>Scatter chart</title>
+</head>
+<script>
+    $(document).ready(function(){
+        $.getJSON('https://raw.githubusercontent.com/FreeCodeCamp/ProjectReferenceData/master/cyclist-data.json', function(theData){
+            const dataset = theData
+            const margin = { top: 30, bot: 30, left: 80, right: 20}
+            const w = 750 - margin.right - margin.left
+                h = 550 - margin.top - margin.bot
+
+            const maxRank = 1,
+                minRank = 35
+
+            const maxTime = d3.max(dataset, (d) => d.Seconds),
+                minTime = d3.min(dataset, (d) => d.Seconds)
+           
+            const xScale = d3.scaleLinear()
+                .domain([maxTime + 10 , minTime - 10])
+                .range([margin.left, w - margin.right])
+
+            const yScale = d3.scaleLinear()
+                .domain([minRank*1.1, maxRank/1.1])
+                .range( [h - margin.bot, margin.top])
+
+            const svg = d3.select('svg')
+                .attr('width', w + margin.left + margin.right)
+                .attr('height', h + margin.top + margin.bot)
+                .style('fill', 'white')
+
+            let popup = d3.select("body").append("div")	
+                .attr("class", "popup")				
+                .style("opacity", 0);
+
+           // creating scatter plot
+            svg.selectAll('circle')
+                .data(dataset)
+                .enter()
+                .append('circle')
+                .attr('cx', (d) => xScale(d.Seconds))
+                .attr('cy', (d) => yScale(d.Place))
+                .attr('r', (d) => 5)
+                .attr('fill', (d) => d.Doping === '' ? 'white' : 'gray')
+                .on('mouseover', (d) => {
+                    popup.transition()
+                        .duration(200)
+                        .style('opacity', .9)
+                    popup.html( 'In ' + d.Year + '<br/>' + d.Name + ', completed in ' + d.Time + ' minutes' + '<br/>' + d.Doping)
+                        .style('top', yScale(d.Place) + 'px')
+                        .style('left', xScale(d.Seconds) + 'px')
+                })
+                .on('mouseout', (d) => {
+                    popup.transition()
+                        .duration(300)
+                        .style('opacity', 0)
+                })
+
+            //adding names of bikers
+            svg.selectAll('text')
+                .data(dataset)
+                .enter()
+                .append('text')
+                .text((d) => d.Name)
+                .attr('x', (d) => xScale(d.Seconds) + 15)
+                .attr('y', (d) => yScale(d.Place) + 5)
+                .attr('class', 'tooltip')
+                
+            
+            //create axes
+            const xAxis = d3.axisBottom(xScale),
+                yAxis = d3.axisLeft(yScale)
+
+            svg.append('g')
+                .attr('transform', 'translate(0,' + (h - margin.bot) + ')')
+                .attr('class', 'axisWhite')
+                .call(xAxis)
+            
+            svg.append('g')
+                .attr('transform', 'translate(' + margin.left + ', 0)')
+                .attr('class', 'axisWhite')
+                .call(yAxis)
+            
+             //adding legend
+             svg.append('circle')
+                .attr('cx', xScale(2240))
+                .attr('cy', yScale(30))
+                .attr('r', 5)
+                .attr('fill', 'white')
+
+            svg.append('text')
+                .attr('x', xScale(2235))
+                .attr('y', yScale(30) + 5)
+                .text('No doping guy')
+
+            svg.append('circle')
+                .attr('cx', xScale(2240))
+                .attr('cy', yScale(25))
+                .attr('r', 5)
+                .attr('fill', 'gray')
+            
+            svg.append('text')
+                .attr('x', xScale(2240 - 5))
+                .attr('y', yScale(25) + 5)
+                .text('Doping guy')
+            
+            //create axes name
+            svg.append('text')
+                .attr('transform', 'translate(' + w/2 + ',' + (h + margin.bot/2) + ')')
+                .text('Time (Seconds)')
+            
+            svg.append('text')
+                .attr('transform', 'rotate(-90)')
+                .attr('y', margin.left/2 )
+                .attr('x', -h/2)
+                .text('Rank')
+
+        })
+    })
+</script>
+<style>
+    body{
+        background: url(http://cdn.media.cyclingnews.com/2017/06/08/1/20176088_372903_670.jpg);
+        background-size: cover;
+        background-position: center;
+        font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+    }
+    .chart{
+        width: fit-content;
+        height: fit-content;
+        margin: 0 auto;
+        background: rgba(0, 0, 0, 0.8);
+        border-radius: 5px;
+        color: white;
+    }
+    .tooltip{
+        font-size: 13px;
+    }
+    .popup {	
+        position: absolute;
+        text-align: center;			
+        padding: 5px;				
+        font: 14px sans-serif;		
+        background: #2D3033;	
+        color: white;		
+        border-radius: 4px;			
+        pointer-events: none;			
+    }
+    .axisWhite line{
+    stroke: whitesmoke;
+    }
+
+    .axisWhite path{
+    stroke: whitesmoke;
+    }
+
+    .axisWhite text{
+    fill: whitesmoke;
+    }  
+
+</style>
+<body>
+    <div class="chart">
+        <div class="title" style="text-align: center">
+            <h2>Doping in Professtional Bicycle Racing</h2>
+        </div>
+        <svg></svg>
+    </div>
+</body>
+</html>
