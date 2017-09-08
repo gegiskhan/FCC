@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <script src='https://cdnjs.cloudflare.com/ajax/libs/d3/4.9.1/d3.min.js'></script>
+    <script src="https://ajax.aspnetcdn.com/ajax/jQuery/jquery-3.2.1.min.js"></script>
+
+</head>
+
+<script>
+    $(document).ready(function () {
+        $.getJSON('https://raw.githubusercontent.com/FreeCodeCamp/ProjectReferenceData/master/GDP-data.json', function (theData) {
+            const dataset = theData.data
+            $('.desc').text(theData.description)
+            const w = 1000,
+                h = 500
+            const padding = 60
+            const barWidth = (w - padding*1.5)/(dataset.length)
+
+            const maxGDP = d3.max(dataset, (d) => d[1]),
+                minGDP = d3.min(dataset, (d) => d[1])
+
+            const maxDate = new Date(dataset[dataset.length -1][0]),
+                minDate = new Date(dataset[0][0])
+            
+            const xScale = d3.scaleTime()
+                .domain([minDate, maxDate])
+                .range([padding, w - padding/2])
+            
+            const yScale = d3.scaleLinear()
+                .domain([minGDP - 200, maxGDP + 200]) // the value 100 is to make the lowest GDP look != 0 in yaxis
+                .range([h - padding, padding/2])
+
+            const svg = d3.select('svg')
+                .attr('width', w)
+                .attr('height', h)
+
+            svg.selectAll('rect')
+                .data(dataset)
+                .enter()
+                .append('rect')
+                .attr('class', 'bar')
+                .attr('x', (d, i) => padding + i*barWidth)
+                .attr('y', (d) => yScale(d[1]))
+                .attr('width', barWidth)
+                .attr('height', (d)=> h - padding - yScale(d[1]))
+                .attr('fill', 'cadetblue')
+                .append('title')
+                .text((d) => '$' + d[1] + ' Billion' + ', ' + d[0].slice(0, d[0].length-3))
+
+            const xAxis = d3.axisBottom(xScale)
+            svg.append('g')
+                .attr('transform', 'translate(0,' + (h - padding) + ')')
+                .call(xAxis)
+            
+            const yAxis = d3.axisLeft(yScale)
+            svg.append('g')
+                .attr('transform', 'translate('+ padding +',0)')
+                .call(yAxis)
+        })
+    })
+
+</script>
+<style>
+    body {
+        background: #777;
+    }
+    .chart{
+        width: 1020px;
+        height: 620px;
+        background: whitesmoke;
+        margin: 0 auto;
+    }
+    .bar:hover{
+        fill: whitesmoke;
+    }
+    .desc{
+        text-align: center;
+        padding: 10px;
+        font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+    }
+    
+</style>
+
+<body>
+    <div class="chart">
+        <div class="title" style="text-align: center">
+            <h1>US Gross Domestic Product</h1>
+        </div>
+        <svg></svg>
+        <div class="desc"></div>
+    </div>
+    
+</body>
+
+</html>
