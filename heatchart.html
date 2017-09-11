@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <script src='https://cdnjs.cloudflare.com/ajax/libs/d3/4.9.1/d3.min.js'></script>
+    <script src="https://ajax.aspnetcdn.com/ajax/jQuery/jquery-3.2.1.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.5.2/animate.min.css">
+    <title>Global Heat </title>
+</head>
+<script>
+    $(document).ready(function(){
+        $.getJSON('https://raw.githubusercontent.com/FreeCodeCamp/ProjectReferenceData/master/global-temperature.json', (theData) => {
+            const dataset = theData.monthlyVariance
+            const margin = {top: 20, bot: 60, left: 50, right: 30}
+            const w = 1300 - margin.right - margin.left
+                h = 550 - margin.top - margin.bot
+
+            const baseTemp = theData.baseTemperature
+
+            //const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+            const yScale = d3.scaleLinear()
+                .domain([0, 12])
+                .range([ h, 0])
+
+            const maxYear = d3.max(dataset, (d) => d.year)
+            const minYear = d3.min(dataset, (d) => d.year)
+            
+            const xScale = d3.scaleLinear()
+                .domain([minYear, maxYear])
+                .range([0, w ])
+            
+            const svg = d3.select('svg')
+                .attr('width', w + margin.left + margin.right)
+                .attr('height', h + margin.top + margin.bot)
+                .append('g')
+                .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')')
+                
+            const colorScheme = ['#a50026','#d73027','#f46d43','#fdae61','#fee090','#ffffbf','#e0f3f8','#abd9e9','#74add1','#4575b4','#313695']
+            const colors = d3.scaleQuantile()
+                .domain([d3.min(dataset, (d) => d.variance), d3.max(dataset, (d) => d.variance)])
+                .range(colorScheme.reverse())
+                
+            
+            const barWidth = w/(maxYear-minYear),
+                barHeight = h/12
+
+            let popup = d3.select("body").append("div")	
+            .attr("class", "popup")				
+            .style("opacity", 0)
+            //create bars
+            svg.selectAll('rect')
+                .data(dataset)
+                .enter()
+                .append('rect')
+                .attr('class', 'cell')
+                .attr('x', (d) => xScale(d.year))
+                .attr('y', (d) => yScale(d.month))
+                .attr('width', barWidth)
+                .attr('height', barHeight)
+                .attr('fill', (d, i) => colors(d.variance))
+                .on('mouseover', (d) => {
+                    popup.transition()
+                        .duration(200)
+                        .style('opacity', .9)
+                    popup.html( 'Time: ' + d.month + '/' + d.year + '<br/>' +(d.variance + baseTemp).toFixed(2) + '&deg;C')
+                        .style('top', yScale(d.month) + 30 + 'px')
+                        .style('left', xScale(d.year) + 30 + 'px')
+                })
+                .on('mouseout', (d) => {
+                    popup.transition()
+                        .duration(300)
+                        .style('opacity', 0)
+                })
+            
+            svg.append("g")
+                .attr("transform", "translate(0," + h + ")")
+                .call(d3.axisBottom(xScale).ticks(20))
+                
+            // add the y Axis
+            svg.append("g")
+                .call(d3.axisLeft(yScale))
+            
+            //add label for axis
+            svg.append('text')
+                .attr('transform', 'translate(' + (w) + ',' + (h+margin.bot/1.5) + ')' )
+                .attr('text-anchor', 'middle')
+                .text('Year')
+
+            svg.append('text')
+            .attr('transform', 'translate(' + 0 + ',' + -10 + ')' )
+            .attr('text-anchor', 'middle')
+            .text('Month')
+
+            //add legend
+            const cellWidth = 30
+            svg.selectAll('.legend')
+                .data(colorScheme)
+                .enter()
+                .append('rect')
+                .attr('class', 'legend')
+                .attr('x', (d, i) => i*cellWidth)
+                .attr('y', h + margin.bot/2)
+                .attr('width', cellWidth)
+                .attr('height', 10)
+                .attr('fill', (d) => d)
+            
+            let tempRange = d3.max(dataset, (d) => d.variance) - d3.min(dataset, (d) => d.variance)
+            let tempDiff = (tempRange/11)
+            let startTemp = d3.min(dataset, (d) => d.variance) + baseTemp + tempDiff
+            for (let i=1; i < colorScheme.length; i++){
+                svg.append('text')
+                    .attr('class', 'small-text')
+                    .attr('x', i*cellWidth - 8)
+                    .attr('y', h + margin.bot/2 + 20)
+                    .text((i) => i == 0 ? '0' : startTemp.toFixed(1))
+                startTemp += tempDiff
+                
+            }
+        })
+    })
+</script>
+<style>
+     body{
+        background: #ccc;
+        background-size: cover;
+        background-position: center;
+        font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+    }
+    .chart{
+        width: fit-content;
+        height: fit-content;
+        margin: 0 auto;
+        background: whitesmoke;
+        border-radius: 5px;
+    }
+    .cell{
+        box-sizing: border-box;
+        padding: 0;
+        margin: 0;
+    }
+    .cell:hover{
+        fill: #777;
+    }
+    .popup {	
+        position: absolute;
+        text-align: center;			
+        padding: 5px;				
+        font: 14px sans-serif;		
+        background: #2D3033;	
+        color: white;		
+        border-radius: 4px;			
+        pointer-events: none;			
+    }
+    .small-text{
+        font-size: 11px
+    }
+</style>
+<body>
+    <div class="chart animated fadeIn">
+        <div class="title" style="text-align: center">
+            <h2 style="margin-bottom: 5px;">GLOBAL MONTHLY SURFACE TEMPERATURE</h2>
+            <h3 style="margin-top: 5px; margin-bottom: 5px;">1753 - 2015</h3>
+        </div>
+        <svg></svg>
+    </div>
+</body>
+</html>
