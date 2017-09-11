@@ -41,14 +41,15 @@
             const colors = d3.scaleQuantile()
                 .domain([d3.min(dataset, (d) => d.variance), d3.max(dataset, (d) => d.variance)])
                 .range(colorScheme.reverse())
-                
-            
+                            
             const barWidth = w/(maxYear-minYear),
                 barHeight = h/12
 
+            //create popup when hover
             let popup = d3.select("body").append("div")	
             .attr("class", "popup")				
             .style("opacity", 0)
+
             //create bars
             svg.selectAll('rect')
                 .data(dataset)
@@ -66,14 +67,15 @@
                         .style('opacity', .9)
                     popup.html( 'Time: ' + d.month + '/' + d.year + '<br/>' +(d.variance + baseTemp).toFixed(2) + '&deg;C')
                         .style('top', yScale(d.month) + 30 + 'px')
-                        .style('left', xScale(d.year) + 30 + 'px')
+                        .style('left', xScale(d.year) + 30 +'px')
                 })
                 .on('mouseout', (d) => {
                     popup.transition()
                         .duration(300)
                         .style('opacity', 0)
                 })
-            
+
+            //add xaxis
             svg.append("g")
                 .attr("transform", "translate(0," + h + ")")
                 .call(d3.axisBottom(xScale).ticks(20))
@@ -114,7 +116,7 @@
                     .attr('class', 'small-text')
                     .attr('x', i*cellWidth - 8)
                     .attr('y', h + margin.bot/2 + 20)
-                    .text((i) => i == 0 ? '0' : startTemp.toFixed(1))
+                    .text(startTemp.toFixed(1))
                 startTemp += tempDiff
                 
             }
