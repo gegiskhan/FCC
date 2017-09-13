@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <script src='https://d3js.org/d3.v4.min.js'></script>
+    <script src="https://ajax.aspnetcdn.com/ajax/jQuery/jquery-3.2.1.min.js"></script>
+    <script src="http://d3js.org/topojson.v1.min.js"></script>
+</head>
+<script>
+    $(document).ready(() => {
+        const width = 1200,
+            height = 550
+        
+        const svg = d3.select('.map')
+            .append('svg')
+            .attr('height', height)
+            .attr('width', width)
+            .append('g')
+        
+        let popup = d3.select("body").append("div")	
+            .attr("class", "popup")				
+            .style("opacity", 0)
+
+        d3.queue()
+            .defer(d3.json, 'https://d3js.org/world-50m.v1.json')
+            .defer(d3.json, 'https://raw.githubusercontent.com/FreeCodeCamp/ProjectReferenceData/master/meteorite-strike-data.json')
+            .await(done)
+        
+        const projection = d3.geoMercator()
+            .translate([width/2, height/2])
+        
+        const path = d3.geoPath()
+            .projection(projection)
+
+        
+        function done(error, data, meteorite){
+            //console.log(data)
+            const nations = topojson.feature(data, data.objects.countries).features
+            //console.log(nations)
+            svg.selectAll('.nation')
+                .data(nations)
+                .enter().append('path')
+                .attr('class', 'nation')
+                .attr('d', path)
+            
+            const meteor_location = meteorite.features
+            //console.log(meteor_location)
+            const min = d3.min(meteor_location, d => parseInt(d.properties.mass))
+            const max = d3.max(meteor_location, d => parseInt(d.properties.mass))
+            //console.log(max/1000)
+            const sizeScale = d3.scaleLinear()
+                .domain([min, max/7])
+                .range([1, 10])
+
+            svg.selectAll('.meteor')
+                .data(meteor_location)
+                .enter().append('circle')
+                .attr('class', 'meteor')
+                .attr('cx', (d) => {
+                    return projection([d.properties.reclong,d.properties.reclat])[0]
+                   
+                } )
+                .attr('cy', (d) => {
+                    return projection([d.properties.reclong,d.properties.reclat])[1]
+                })
+                .attr('r', d => d.properties.mass== max ? 20: sizeScale(parseInt(d.properties.mass)))
+                .on('mouseover', (d) => {
+                    popup.transition()
+                        .duration(200)
+                        .style('opacity', .9)
+                    const date = new Date(d.properties.year)
+                    
+                    popup.html( 'In ' + date.getFullYear() + '<br/>'
+                            + 'Name: ' + d.properties.name + '<br/>'
+                            + 'Mass: ' + d.properties.mass + '<br/>'
+                            + 'Latitude, longtitude: ' + d.properties.reclat + ', ' + d.properties.reclong
+                        )
+                        .style('top', projection([d.properties.reclong,d.properties.reclat])[1] + 70  + 'px')
+                        .style('left', projection([d.properties.reclong,d.properties.reclat])[0] + 80 +'px')
+                })
+                .on('mouseout', (d) => {
+                    popup.transition()
+                        .duration(300)
+                        .style('opacity', 0)
+                })
+
+        }
+    })
+</script>
+<style>
+    .map{
+        margin: 0 auto;
+        width: fit-content;
+        height: fit-content;
+    }
+    svg{
+        background: cadetblue;
+    }
+    .nation{
+        fill: #333;
+        stroke-width: 1px;
+        stroke: white;
+    }
+    .meteor{
+        fill: red;
+        opacity: 0.7;
+        
+    }
+    .popup {	
+        position: absolute;
+        text-align: center;			
+        padding: 5px;				
+        font: 14px sans-serif;		
+        background: #2D3033;	
+        color: white;		
+        border-radius: 4px;			
+        pointer-events: none;			
+    }
+</style>
+<body>
+    <h1 style="text-align: center">Global meteor crash sites</h1>
+    <div class="map"></div>
+</body>
+</html>
