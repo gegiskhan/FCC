@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+    <html lang="en">
+
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta http-equiv="X-UA-Compatible" content="ie=edge">
+        <script src='http://d3js.org/d3.v3.min.js'></script>
+        <script src="https://ajax.aspnetcdn.com/ajax/jQuery/jquery-3.2.1.min.js"></script>
+        <link rel="stylesheet" href="https://www.cs.mun.ca/~h65ped/Public/country%20data%20for%20force%20directed%20graph/flags.css">
+        <title>Force Direct Graph</title>
+    </head>
+    <script>
+        $(document).ready(() => {
+            $.getJSON('https://raw.githubusercontent.com/DealPete/forceDirected/master/countries.json', (data) => {
+                const nodes = data.nodes,
+                    links = data.links
+
+                const width = 1000,
+                    height = 600,
+                    r = 5
+
+                const svg = d3.select('.chart').append('svg')
+                    .attr('width', width)
+                    .attr('height', height)
+
+
+                let force = d3.layout.force()
+                    .size([width, height])
+                    .nodes(nodes)
+                    .links(links)
+                    .linkDistance(50)
+                    .charge(-100)
+
+                const link = svg.selectAll('.link')
+                    .data(links)
+                    .enter()
+                    .append('line')
+                    .attr('class', 'link')
+
+                const node = d3.select('.chart').select('.flag-box').selectAll('img')
+                    .data(nodes)
+                    .enter()
+                    .append('img')
+                    .attr('class', (d) => 'flag flag-' + d.code)
+                    .call(force.drag)
+                
+                force.on('tick', () =>{
+                    node.style('left', (d) => Math.max(r, Math.min(width-r, d.x)) +'px')
+			            .style('top', (d) => Math.max(r, Math.min(height-r, d.y))  + 'px')
+
+                    link.attr('x1', (d) => d.source.x)
+                        .attr('x2', (d) => d.target.x)
+                        .attr('y1', (d) => d.source.y)
+                        .attr('y2', (d) => d.target.y);
+                })
+
+                force.start()
+
+
+            })
+        })
+    </script>
+    <style>
+        body {
+            background: #555;
+        }
+
+        .chart {
+            width: fit-content;
+            height: fit-content;
+            margin: 0 auto;
+            background: whitesmoke;
+            border-radius: 5px;
+        }
+
+        .node {
+            width: 8px;
+            height: 5px;
+        }
+
+        .link {
+            stroke: #777;
+            stroke-width: 2px;
+        }
+        .flag{
+            position: absolute
+        }
+        .flag-box{
+            position: absolute
+        }
+    </style>
+
+    <body>
+        <div class="chart">
+            <div class="flag-box"></div>
+        </div>
+    </body>
+
+    </html>
